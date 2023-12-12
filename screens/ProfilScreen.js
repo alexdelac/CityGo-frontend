@@ -7,12 +7,19 @@ import {
     TextInput,
     TouchableOpacity, View
   } from 'react-native';
+  import {useFonts} from 'expo-font'
+
 
   export default function ProfilScreen({ navigation }) {
 
+    const [fontsLoaded] = useFonts({
+      'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
+      'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
+    });
 
-
-
+    if(!fontsLoaded){
+      return null
+    }
 
     return (
 
