@@ -14,9 +14,10 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user';
+import types from './reducers/types'
 
 const store = configureStore({
-  reducer: { user },
+  reducer: { user, types },
 });
 
 const Stack = createNativeStackNavigator();
@@ -28,7 +29,7 @@ const TabNavigator = () => {
       tabBarIcon: ({ color, size }) => {
         let iconName = '';
 
-        if (route.name === 'Map') {
+        if (route.name === 'Home') {
           iconName = 'map';
         } else if (route.name === 'Topdeals') {
           iconName = 'thumbs-o-up';

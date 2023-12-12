@@ -20,11 +20,13 @@ import {
   
 
     const user = useSelector((state) => state.user.value);
-console.log(user)
+    console.log(user)
 
 if(!fontsLoaded){
   return null
 }
+
+
 
     
 
@@ -41,9 +43,9 @@ if(!fontsLoaded){
           </View>
           <View style={styles.buttoncontainer}>
           <TouchableOpacity style={styles.button} activeOpacity={0.8}>
-            <Text style={styles.textButton}>Restaurant</Text>
+            <Text onPress={() => navigation.navigate("TabNavigator", { screen: "Home" })} style={styles.textButton}>Restaurant</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} activeOpacity={0.8}>
+          <TouchableOpacity onPress={() => navigation.navigate("TabNavigator", { screen: "Home" })} style={styles.button} activeOpacity={0.8}>
             <Text style={styles.textButton}>Bar</Text>
           </TouchableOpacity>
           </View>
