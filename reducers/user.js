@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState = {
-    value: {pseudonyme: null, token: null},
+    value: { pseudonyme: null, token: null },
 };
 
 export const userSlice = createSlice({
@@ -15,10 +15,16 @@ export const userSlice = createSlice({
         login: (state, action) => {
             state.value.token = action.payload.token;
             state.value.pseudonyme = action.payload.pseudonyme;
-          },
+        },
+        logout: (state, action) => {
+            
+            state.value.token = null;
+            state.value.pseudonyme = null;
+        },
+
     }
 })
 
 
-export const { addUser, login }= userSlice.actions;
+export const { addUser, login, logout } = userSlice.actions;
 export default userSlice.reducer;

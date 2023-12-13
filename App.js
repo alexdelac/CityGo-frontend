@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -12,13 +11,26 @@ import SignupScreen from './screens/SignupScreen';
 import TopdealsScreen from './screens/TopdealsScreen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user';
-import types from './reducers/types'
+import types from './reducers/types';
+import { persistStore, persistReducer } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import {useEffect} from 'react';
+
+
+
+const reducers = combineReducers({ types, user });
+const persistConfig = { key: 'CityGo', storage: AsyncStorage };
 
 const store = configureStore({
-  reducer: { user, types },
-});
+  reducer: persistReducer(persistConfig, reducers),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
+ });
+ const persistor = persistStore(store);
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -55,8 +67,20 @@ const TabNavigator = () => {
 };
 
 export default function App() {
+    // Function to clear AsyncStorage , only use in case of EXTREME necessity
+    // (() => {
+    //   try {
+    //     AsyncStorage.getAllKeys()
+    //     .then((keys)=> AsyncStorage.multiRemove(keys))
+    //     .then(()=> console.log('Done'))
+    //   } catch(e) {
+    //     console.error(e)
+    //   }
+    // })()
+  
   return (
     <Provider store={store}>
+      <PersistGate persistor={persistor}>
     <NavigationContainer>
 
         <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -69,6 +93,7 @@ export default function App() {
         </Stack.Navigator>
 
       </NavigationContainer>
+      </PersistGate>
       </Provider>
   );
 }
