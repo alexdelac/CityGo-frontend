@@ -22,8 +22,7 @@ const BACKEND_ADDRESS = 'http://10.1.3.138:3000';
 
 export default function SigninScreen({ navigation }) {
 
-  const [signInPassword, setSignInPassword] = useState('');
-  const [signInEmail, setSignInEmail] = useState('');
+  
   const [email, setEmail] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [password, setPassword] = useState('');
@@ -231,5 +230,8 @@ const styles = StyleSheet.create({
   error: {
     fontFamily: 'Quicksand-Medium',
     fontStyle: 'italic',
-  }
+  },
+  inputIsFocused: {
+    borderColor: '#FF7337',
+  },
 });

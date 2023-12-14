@@ -1,21 +1,24 @@
-import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity, View
-} from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal } from 'react-native';
 import { useFonts } from 'expo-font';
 import { logout } from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
 
+
+const BACKEND_ADDRESS = 'http://10.1.3.138:3000';
 
 
 export default function ProfilScreen({ navigation }) {
   const dispatch = useDispatch();
-const user = useSelector((state) => state.user.value)
+  const user = useSelector((state) => state.user.value)
+  const [modalVisible, setModalVisible] = useState(false);
+  const [validModalVisible, setValidModalVisible] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isFocused, setIsFocused] = useState(false)
+  const [updatePassword, setUpdatePassword] = useState('');
+  const [error, setError] = useState(null);
 
 
   const [fontsLoaded] = useFonts({
@@ -28,8 +31,29 @@ const user = useSelector((state) => state.user.value)
   const handleLogout = () => {
     dispatch(logout());
     navigation.navigate('Signin');
-    
+
   };
+
+  const handleUpdatePassword = () => {
+    fetch(`${BACKEND_ADDRESS}/users/updatePassword`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: user.token, oldPassword, newPassword, confirmPassword }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result) {
+          setModalVisible(false)
+          setValidModalVisible(true)
+        } else {
+          setError(data.error)
+        }
+      })
+
+  };
+
+
+
 
   if (!fontsLoaded) {
     return null
@@ -43,24 +67,127 @@ const user = useSelector((state) => state.user.value)
         <View style={styles.textinfo}>
           <Text>Pseudonyme : </Text>
           <Text>user pseudonyme</Text>
-          </View>
-          <View style={styles.textinfo}>
+        </View>
+        <View style={styles.textinfo}>
           <Text>E-mail : </Text>
           <Text>user.email</Text>
+        </View>
+      </View>
+      <View style={styles.buttoncontainer}>
+        <TouchableOpacity style={styles.button} activeOpacity={0.8}>
+          <Text style={styles.textButton}>Modifier mes informations</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={styles.button} activeOpacity={0.8}>
+          <Text style={styles.textButton}>Changer de mot de passe</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Modal to allow user to change his/her password */}
+      <Modal
+        animationType='slide'
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <KeyboardAvoidingView
+          style={styles.modal}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+
+          <View style={styles.modalView}>
+            <Text style={styles.h2Modal}>
+              Changement mot de passe
+            </Text>
+            {isFocused === 'Ancien mot de passe' && <Text style={styles.inputLabelOldPassword}>Ancien mot de passe</Text>}
+            <TextInput
+              onFocus={() => setIsFocused('Ancien mot de passe')}
+              onBlur={() => setIsFocused(false)}
+              autoCapitalize='none'
+              secureTextEntry={true}
+              value={oldPassword}
+              onChangeText={(value) => setOldPassword(value)}
+              style={[styles.input, isFocused === 'Ancien mot de passe' && styles.inputIsFocused]}
+              placeholderTextColor={'#D7D7E5'}
+              placeholder={isFocused === 'Ancien mot de passe' ? '' : 'Ancien mot de passe'} />
+
+            {isFocused === 'Nouveau mot de passe' && <Text style={styles.inputLabelNewPassword}>Nouveau mot de passe</Text>}
+            <TextInput
+              onFocus={() => setIsFocused('Nouveau mot de passe')}
+              onBlur={() => setIsFocused(false)}
+              autoCapitalize='none'
+              secureTextEntry={true}
+              value={newPassword}
+              onChangeText={(value) => setNewPassword(value)}
+              style={[styles.input, isFocused === 'Nouveau mot de passe' && styles.inputIsFocused]}
+              placeholderTextColor={'#D7D7E5'}
+              placeholder={isFocused === 'Nouveau mot de passe' ? '' : 'Nouveau mot de passe'} />
+
+            {isFocused === 'Confirmation mot de passe' && <Text style={styles.inputLabelUpdatePassword}>Confirmation mot de passe</Text>}
+            <TextInput
+              onFocus={() => setIsFocused('Confirmation mot de passe')}
+              onBlur={() => setIsFocused(false)}
+              autoCapitalize='none'
+              secureTextEntry={true}
+              value={confirmPassword}
+              onChangeText={(value) => setConfirmPassword(value)}
+              style={[styles.input, isFocused === 'Confirmation mot de passe' && styles.inputIsFocused]}
+              placeholderTextColor={'#D7D7E5'}
+              placeholder={isFocused === 'Confirmation mot de passe' ? '' : 'Confirmation mot de passe'} />
+
+            {error && <Text style={styles.error}>{error}</Text>}
+
+            <TouchableOpacity
+              style={styles.button1}
+              activeOpacity={0.8}
+              onPress={() => handleUpdatePassword()}>
+              <Text style={styles.textButton1}>
+                Valider
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.button2}
+              activeOpacity={0.8}
+              onPress={() => setModalVisible(false)} >
+              <Text style={styles.textButton2}>
+                Retour
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Modal to confirm that the password has been changed */}
+      <Modal
+        animationType='slide'
+        transparent={true}
+        visible={validModalVisible}
+        onRequestClose={() => {
+          setValidModalVisible(!validModalVisible);
+        }}>
+        <View style={styles.modal}>
+          <View style={styles.modalView}>
+
+            <Text style={styles.h2Modal}>
+              Changement mot de passe
+            </Text>
+            <Text style={styles.modalViewText}>Mot de passe change !</Text>
+            <TouchableOpacity
+              style={styles.button}
+              activeOpacity={0.8}
+              onPress={() => setValidModalVisible(false)} >
+              <Text style={styles.textButton}>
+                OK
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
-      <View style={styles.buttoncontainer}>
-          <TouchableOpacity style={styles.button} activeOpacity={0.8}>
-            <Text style={styles.textButton}>Modifier mes informations</Text>
-          </TouchableOpacity>
-          <TouchableOpacity  style={styles.button} activeOpacity={0.8}>
-            <Text style={styles.textButton}>Changer de mot de passe</Text>
-          </TouchableOpacity>
-          </View>
-          <TouchableOpacity  style={styles.deconnectbutton} activeOpacity={0.8} onPress={() => handleLogout()}>
-            <Text  style={styles.textdeconnectButton}>Se déconnecter</Text>
-          </TouchableOpacity>
-          <TouchableOpacity>
+      </Modal>
+
+      <TouchableOpacity style={styles.deconnectbutton} activeOpacity={0.8} onPress={() => handleLogout()}>
+        <Text style={styles.textdeconnectButton}>Se déconnecter</Text>
+      </TouchableOpacity>
+      <TouchableOpacity>
         <Text style={styles.deleteLink}>Supprimer le compte</Text>
       </TouchableOpacity>
     </View>
@@ -71,7 +198,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
   },
   title: {
     color: '#FF7337',
@@ -98,15 +225,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#8440B4',
     borderRadius: 50,
     alignItems: 'center',
-    paddingTop: 8,     
+    paddingTop: 8,
     marginBottom: 25,
   },
   textButton: {
     color: '#ffffff',
-      fontWeight: '600',
-      fontSize: 16,
-      fontFamily: 'Quicksand-SemiBold',
-      textAlign: 'center',
+    fontWeight: '600',
+    fontSize: 16,
+    fontFamily: 'Quicksand-SemiBold',
+    textAlign: 'center',
   },
   buttoncontainer: {
     alignItems: 'center',
@@ -120,7 +247,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center'
-    
+
   },
   textdeconnectButton: {
     color: '#8440B4',
@@ -138,5 +265,118 @@ const styles = StyleSheet.create({
   },
   textinfo: {
     flexDirection: 'row',
-  }
+  },
+  h2Modal: {
+    color: '#FF7337',
+    fontSize: 36,
+    fontFamily: 'Quicksand-Bold',
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+  modalViewText: {
+    marginBottom: 20,
+    fontFamily: 'Quicksand-Medium',
+    fontStyle: 'italic',
+  },
+  modal: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fond semi-transparent
+  },
+  modalView: {
+    backgroundColor: 'white',
+    width: '90%',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    elevation: 5, // Effet d'élévation pour Android
+  },
+  modalText: {
+    marginBottom: 20,
+    textAlign: 'center',
+    fontSize: 24,
+  },
+  input: {
+    width: 285,
+    height: 55,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#D7D7E5',
+    marginTop: 9,
+    paddingLeft: 9,
+  },
+  inputIsFocused: {
+    borderColor: '#FF7337',
+  },
+  inputLabelOldPassword: {
+    position: 'relative',
+    color: '#FF7337',
+    textAlign: 'left',
+    width: 160,
+    marginBottom: -20,
+    marginRight: 100,
+    backgroundColor: 'white',
+    zIndex: 1,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  inputLabelNewPassword: {
+    position: 'relative',
+    color: '#FF7337',
+    textAlign: 'left',
+    width: 180,
+    marginBottom: -20,
+    marginRight: 80,
+    backgroundColor: 'white',
+    zIndex: 1,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  inputLabelUpdatePassword: {
+    position: 'relative',
+    color: '#FF7337',
+    textAlign: 'left',
+    width: 250,
+    marginBottom: -20,
+    marginRight: 10,
+    backgroundColor: 'white',
+    zIndex: 1,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  button1: {
+    backgroundColor: '#8440B4',
+    borderRadius: 50,
+    marginBottom: 0,
+    height: 50,
+    width: 285,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  textButton1: {
+    color: 'white',
+    fontSize: 24,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  button2: {
+    backgroundColor: '#FFF',
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: '#8440B4',
+    marginBottom: 5,
+    height: 50,
+    width: 285,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 9,
+  },
+  textButton2: {
+    color: '#8440B4',
+    fontSize: 24,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  error: {
+    fontFamily: 'Quicksand-Medium',
+    fontStyle: 'italic',
+  },
 });
