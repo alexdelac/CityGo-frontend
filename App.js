@@ -41,7 +41,7 @@ const TabNavigator = () => {
       tabBarIcon: ({ color, size }) => {
         let iconName = '';
 
-        if (route.name === 'Home') {
+        if (route.name === 'Plan') {
           iconName = 'map';
         } else if (route.name === 'Topdeals') {
           iconName = 'thumbs-o-up';
@@ -53,11 +53,11 @@ const TabNavigator = () => {
 
         return <FontAwesome name={iconName} size={size} color={color} />;
       },
-      tabBarActiveTintColor: '#ec6e5b',
-      tabBarInactiveTintColor: '#335561',
+      tabBarActiveTintColor: '#8440B4',
+      tabBarInactiveTintColor: '#D7D7E5',
       headerShown: false,
     })}>
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Plan" component={HomeScreen} />
       <Tab.Screen name="Topdeals" component={TopdealsScreen} />
       <Tab.Screen name="Favoris" component={FavorisScreen} />
       <Tab.Screen name="Profil" component={ProfilScreen} />
