@@ -13,12 +13,7 @@ import { useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useFonts } from 'expo-font'
 
-
-
-
-const BACKEND_ADDRESS = 'http://10.1.3.138:3000';
-
-
+const BACKEND_ADDRESS = 'http://10.1.2.64:3000';
 
 export default function SigninScreen({ navigation }) {
 
@@ -87,6 +82,7 @@ export default function SigninScreen({ navigation }) {
 
 
   return (
+    <View style={styles.container}>
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Text style={styles.title}>Connexion</Text>
       <View>
@@ -99,7 +95,7 @@ export default function SigninScreen({ navigation }) {
           placeholder={isFocused === 'Email' ? '' : 'Email'}
           onChangeText={(value) => setEmail(value)}
           value={email} />
-        {isFocused === 'Mot de passe' && <Text style={styles.inputLabel}>Mot de passe</Text>}
+        {isFocused === 'Mot de passe' && <Text style={styles.inputLabelPassword}>Mot de passe</Text>}
         <TextInput
           onFocus={() => setIsFocused('Mot de passe')}
           onBlur={() => setIsFocused(false)}
@@ -118,6 +114,8 @@ export default function SigninScreen({ navigation }) {
       <TouchableOpacity onPress={() => handleConnect()} style={styles.button} activeOpacity={0.8}>
         <Text style={styles.buttonText}>Envoyer</Text>
       </TouchableOpacity>
+      </KeyboardAvoidingView>
+      <View style={styles.bottomContainer}>
       <Text style={styles.reseauxText}>ou connecte-toi grâce à tes réseaux</Text>
       <View style={styles.logocontainer}>
         <TouchableOpacity>
@@ -133,7 +131,8 @@ export default function SigninScreen({ navigation }) {
           <Text style={styles.linkText}> Inscris-toi</Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </View>
+    </View>
   )
 };
 
@@ -142,14 +141,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+  },
+  bottomContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: 291,
+    marginTop: 50,
   },
 
   title: {
-    color: '#FF7337',
     fontSize: 36,
+    color: '#FF7337',
     fontFamily: 'Quicksand-Bold',
-    marginTop: 25
+    marginTop: 90,
+    marginBottom: 50,
   },
 
   input: {
@@ -177,6 +185,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 20,
   },
 
   reseauxText: {
@@ -208,12 +217,24 @@ const styles = StyleSheet.create({
   },
   box: {
     flexDirection: 'row',
+    marginBottom: 60,
   },
   inputLabel: {
     position: 'relative',
     color: '#FF7337',
     textAlign: 'center',
-    width: 70,
+    width: 50,
+    marginBottom: -14,
+    marginLeft: 20,
+    backgroundColor: 'white',
+    zIndex: 1,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  inputLabelPassword: {
+    position: 'relative',
+    color: '#FF7337',
+    textAlign: 'center',
+    width: 100,
     marginBottom: -14,
     marginLeft: 20,
     backgroundColor: 'white',

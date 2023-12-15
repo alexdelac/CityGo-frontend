@@ -38,8 +38,8 @@ if(!fontsLoaded){
         <View style={styles.container} >
           <View style={styles.welcomecontainer}>
           <Text style={styles.title}>Hello {''}
-          <Text style={styles.pseudonyme}>{user.pseudonyme}</Text>
-           , où allons nous ?</Text>
+          <Text style={styles.pseudonyme}>{user.pseudonyme}</Text>,</Text>
+           <Text style={styles.title}>où allons-nous ?</Text>
           </View>
           <View style={styles.buttoncontainer}>
           <TouchableOpacity style={styles.button} activeOpacity={0.8}>
@@ -62,21 +62,18 @@ if(!fontsLoaded){
       justifyContent: 'center',
     },
     title: {
-      width: 343,
-      height: 108,
       fontSize: 36,
-      fontWeight: '600',
       textAlign: 'center',
       fontFamily: 'Quicksand-SemiBold',
     },
     button: {
-      alignItems: 'center',
-      paddingTop: 8,
       width: 285,
       height: 80,
       backgroundColor: '#8440B4',
       borderRadius: 50,
-      marginBottom: 25,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 20,
       
     },
     textButton: {
@@ -97,8 +94,6 @@ if(!fontsLoaded){
       
       justifyContent: 'center',
       alignItems: 'center',
-      height: 108,
-      width: 343,
       textAlign: 'center',
       marginBottom: 70,
     },

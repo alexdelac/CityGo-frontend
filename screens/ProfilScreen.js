@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 
 
-const BACKEND_ADDRESS = 'http://10.1.3.138:3000';
+const BACKEND_ADDRESS = 'http://10.1.2.64:3000';
 
 
 export default function ProfilScreen({ navigation }) {

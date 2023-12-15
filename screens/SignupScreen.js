@@ -8,11 +8,7 @@ import { addUser } from '../reducers/user';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useFonts } from 'expo-font'
 
-
-
-
-const BACKEND_ADDRESS = 'http://10.1.3.138:3000';
-
+const BACKEND_ADDRESS = 'http://10.1.2.64:3000';
 
 export default function SignupScreen({ navigation }) {
 
@@ -77,6 +73,7 @@ export default function SignupScreen({ navigation }) {
   }
 
   return (
+    <View style={styles.container}>
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <Text style={styles.title}>Inscription</Text>
 
@@ -131,7 +128,9 @@ export default function SignupScreen({ navigation }) {
       <TouchableOpacity onPress={() => handleSubmit()} style={styles.button} activeOpacity={0.8}>
         <Text style={styles.buttonText}>Envoyer</Text>
       </TouchableOpacity>
-      <Text style={styles.message}>ou inscris-toi grâce à tes   réseaux :</Text>
+      </KeyboardAvoidingView>
+      <View style={styles.bottomContainer}>
+      <Text style={styles.message}>ou inscris-toi grâce à tes réseaux :</Text>
       <View style={styles.logocontainer}>
         <TouchableOpacity>
           <FontAwesome name='facebook-square' style={styles.logo} size={50} color='#000080'></FontAwesome>
@@ -146,7 +145,8 @@ export default function SignupScreen({ navigation }) {
           <Text style={styles.linkText}> Connecte-toi</Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+      </View>
+    </View>
   )
 };
 
@@ -155,15 +155,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+  },
+  bottomContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: 291,
+    marginTop: 200,
   },
 
   title: {
-    color: '#FF7337',
     fontSize: 36,
-    marginTop: 25,
+    color: '#FF7337',
     fontFamily: 'Quicksand-Bold',
-
+    marginTop: 90,
+    marginBottom: 50,
   },
 
   input: {
@@ -200,6 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 20,
   },
 
   buttonText: {
@@ -212,7 +221,7 @@ const styles = StyleSheet.create({
 
   textContainer: {
     flexDirection: 'row',
-
+    marginBottom: 60,
   },
 
   text: {
@@ -229,7 +238,7 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 24,
     textAlign: 'center',
-    fontFamily: 'Quicksand-Bold',
+    fontFamily: 'Quicksand-SemiBold',
 
   },
   logocontainer: {
@@ -237,7 +246,6 @@ const styles = StyleSheet.create({
 
   },
   error: {
-    fontFamily: 'Quicksand-Medium',
-    fontStyle: 'italic',
+    fontFamily: 'Quicksand-Bold',
   },
 });
