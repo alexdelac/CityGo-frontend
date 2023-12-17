@@ -1,14 +1,20 @@
-import { Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal } from 'react-native';
+import {  KeyboardAvoidingView, 
+          Platform, 
+          StyleSheet, 
+          Text, 
+          TextInput, 
+          TouchableOpacity, 
+          View, 
+          Modal } from 'react-native';
 import { useFonts } from 'expo-font';
 import { logout } from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 
-
-const BACKEND_ADDRESS = 'http://10.1.2.64:3000';
-
+const BACKEND_ADDRESS = 'http://192.168.1.49:3000';
 
 export default function ProfilScreen({ navigation }) {
+
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.value)
   const [modalVisible, setModalVisible] = useState(false);
@@ -20,18 +26,17 @@ export default function ProfilScreen({ navigation }) {
   const [updatePassword, setUpdatePassword] = useState('');
   const [error, setError] = useState(null);
 
-
   const [fontsLoaded] = useFonts({
     'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
     'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf'),
     'Quicksand-Light': require('../assets/fonts/Quicksand-Light.ttf'),
     'Quicksand-Medium': require('../assets/fonts/Quicksand-Medium.ttf'),
+    'Quicksand-Regular': require('../assets/fonts/Quicksand-Regular.ttf'),
   });
 
   const handleLogout = () => {
     dispatch(logout());
     navigation.navigate('Signin');
-
   };
 
   const handleUpdatePassword = () => {
@@ -49,38 +54,32 @@ export default function ProfilScreen({ navigation }) {
           setError(data.error)
         }
       })
-
   };
-
-
-
 
   if (!fontsLoaded) {
     return null
   }
 
   return (
-
-    <View style={styles.container}>
-      <Text style={styles.title}>Mon Profil</Text>
-      <View style={styles.textcontainer}>
-        <View style={styles.textinfo}>
-          <Text>Pseudonyme : </Text>
-          <Text>user pseudonyme</Text>
-        </View>
-        <View style={styles.textinfo}>
-          <Text>E-mail : </Text>
-          <Text>user.email</Text>
-        </View>
+  
+  <View style={styles.container}>
+    <Text style={styles.title}>Mon Profil</Text>
+    <View style={styles.infosContainer}>
+      <View style={styles.infosText}>
+        <Text style={styles.titleText}>Pseudonyme : </Text>
+        <Text style={styles.userText}>{user.pseudonyme}</Text>
       </View>
-      <View style={styles.buttoncontainer}>
-        <TouchableOpacity style={styles.button} activeOpacity={0.8}>
-          <Text style={styles.textButton}>Modifier mes informations</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={styles.button} activeOpacity={0.8}>
-          <Text style={styles.textButton}>Changer de mot de passe</Text>
-        </TouchableOpacity>
+      <View style={styles.infosBottomText}>
+        <Text style={styles.titleText}>E-mail : </Text>
+        <Text style={styles.userText}>{user.mail}</Text>
       </View>
+      <TouchableOpacity style={styles.button} activeOpacity={0.8}>
+        <Text style={styles.textButton}>Modifier mes informations</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={styles.button} activeOpacity={0.8}>
+        <Text style={styles.textButton}>Changer de mot de passe</Text>
+      </TouchableOpacity>
+    </View> 
 
       {/* Modal to allow user to change his/her password */}
       <Modal
@@ -183,13 +182,15 @@ export default function ProfilScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-
+      <View style={styles.bottomButtons}>
       <TouchableOpacity style={styles.deconnectbutton} activeOpacity={0.8} onPress={() => handleLogout()}>
         <Text style={styles.textdeconnectButton}>Se déconnecter</Text>
       </TouchableOpacity>
       <TouchableOpacity>
         <Text style={styles.deleteLink}>Supprimer le compte</Text>
       </TouchableOpacity>
+      </View>
+    
     </View>
   )
 };
@@ -201,10 +202,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   title: {
-    color: '#FF7337',
     fontSize: 36,
+    color: '#FF7337',
     fontFamily: 'Quicksand-Bold',
-    textAlign: 'center',
+    marginTop: 90,
+    marginBottom: 50,
   },
   info: {
     textAlign: 'center',
@@ -225,19 +227,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#8440B4',
     borderRadius: 50,
     alignItems: 'center',
-    paddingTop: 8,
-    marginBottom: 25,
+    justifyContent: 'center',
+    marginTop: 15,
   },
   textButton: {
     color: '#ffffff',
-    fontWeight: '600',
     fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
-    textAlign: 'center',
-  },
-  buttoncontainer: {
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+
   },
   deconnectbutton: {
     width: 285,
@@ -247,24 +244,45 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center'
-
+  },
+  bottomButtons: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginBottom: 30,
   },
   textdeconnectButton: {
     color: '#8440B4',
+    fontSize: 16,
+    fontFamily: 'Quicksand-SemiBold'
   },
   deleteLink: {
     color: '#FF7337',
     fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold'
+    fontFamily: 'Quicksand-SemiBold',
+    marginTop: 15,
   },
-  textcontainer: {
+  infosContainer: {
+    flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
-    fontFamily: 'Quicksand-Light',
-    fontSize: 20,
+    justifyContent: 'flex-start',
   },
-  textinfo: {
+  infosText: {
     flexDirection: 'row',
+  },
+  infosBottomText: {
+    flexDirection: 'row',
+    marginBottom: 50,
+  },
+  titleText: {
+    fontSize: 20,
+    fontFamily: 'Quicksand-Bold',
+  },
+  userText: {
+    fontSize: 20,
+    fontFamily: 'Quicksand-Regular',
   },
   h2Modal: {
     color: '#FF7337',
@@ -314,7 +332,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     color: '#FF7337',
     textAlign: 'left',
-    width: 160,
+    width: 140,
     marginBottom: -20,
     marginRight: 100,
     backgroundColor: 'white',
@@ -325,7 +343,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     color: '#FF7337',
     textAlign: 'left',
-    width: 180,
+    width: 160,
     marginBottom: -20,
     marginRight: 80,
     backgroundColor: 'white',
@@ -336,9 +354,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     color: '#FF7337',
     textAlign: 'left',
-    width: 250,
+    width: 190,
     marginBottom: -20,
-    marginRight: 10,
+    marginRight: 50,
     backgroundColor: 'white',
     zIndex: 1,
     fontFamily: 'Quicksand-SemiBold',

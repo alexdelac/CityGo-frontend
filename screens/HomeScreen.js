@@ -4,123 +4,263 @@ import {
   TextInput,
   TouchableOpacity, 
   View,
-  Modal
+  Modal,
+  Image,
+  ScrollView,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import MapView, { Marker } from 'react-native-maps';
 import { useEffect, useState } from 'react';
 import Checkbox from 'expo-checkbox';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { format } from 'date-fns';
 import * as Location from 'expo-location';
 
 export default function HomeScreen({ navigation }) {
 
   const [currentPosition, setCurrentPosition] = useState(null);
-  const [FilterModalVisible, setFilterModalVisible] = useState(false);
+  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
+  const [EtablishmentsModalVisible, setEtablishmentsModalVisible] = useState(false);
+  const [DescriptionModalVisible, setDescriptionModalVisible] = useState(false);
+  const [isCheckedEvent, setCheckedEvent] = useState('');
+  const [isCheckedBar, setCheckedBar] = useState('');
+  const [isCheckedRestaurant, setCheckedRestaurant] = useState('');
+  const [isCheckedFavorite, setCheckedFavorite] = useState('');
+  const [isCheckedPromo, setCheckedPromo] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [selectedStartDate, setSelectedStartDate] = useState(null);
+  const imageUrl = 'https://lille.citycrunch.fr/wp-content/uploads/sites/6/2020/09/lovster_bar_lille_-1024x654.jpg';
 
   const [fontsLoaded] = useFonts({
     'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
-    'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
+    'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf'),
+    'Quicksand-Regular': require('../assets/fonts/Quicksand-Regular.ttf'),
   });
 
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+};
+const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+};
+const handleConfirm = (date) => {
+    console.warn("Date sélectionnée: ", date);
+    setSelectedStartDate(date);
+    hideDatePicker();
+};
+
+  
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
-
       if (status === 'granted') {
         Location.watchPositionAsync({ distanceInterval: 10 },
           (location) => {
             setCurrentPosition(location.coords);
           });
-      }
-    })();
+        }
+      })();
   }, []);
 
+// Fonts import
   if (!fontsLoaded) {
     return null
   }
 
   return (
-    <View style={styles.container}>
-      
-      <View style={styles.filterContainer}>
-        <View style={styles.filter}>
+  <View style={styles.container}>
+{/* Filter view */}
+    <View style={styles.filterContainer}>
+      <View style={styles.filter}>
+        <TextInput 
+          placeholder={'Adresse, ville, métro...'}
+          style={styles.filterPlace}
+        />
+        <View style={styles.filterBottom}>
           <TextInput 
-            placeholder={'Adresse, ville, métro...'}
-            style={styles.filterPlace}
-          />
-          <View style={styles.filterBottom}>
-            <TextInput 
-              placeholder={'Quand ?'}
-              style={styles.filterWhen}
-            />
-            <TouchableOpacity
-              style={styles.buttonFilter}
-              activeOpacity={0.8}
-              onPress={() => setFilterModalVisible(true)}>
-                <Text style={styles.textButtonFilter}>
-                  + de filtres
-                </Text>
-            </TouchableOpacity>
-          </View>
+                placeholder='Quand ?' 
+                onFocus={showDatePicker}
+                value={selectedStartDate ? format(selectedStartDate, 'dd/MM/yy HH:mm') : ''}
+                style={styles.filterWhen} 
+                />
+              <DateTimePickerModal
+                isVisible={isDatePickerVisible}
+                mode="datetime"
+                onConfirm={handleConfirm}
+                onCancel={() => { hideDatePicker() }}
+                locale="fr"
+                cancelTextIOS="Annuler" // A voir pour Android
+                confirmTextIOS="Confirmer" // A voir pour Android
+                />
+          <TouchableOpacity
+            style={styles.buttonFilter}
+            activeOpacity={0.8}
+            onPress={() => setIsFilterModalVisible(!isFilterModalVisible)}
+          >
+            <Text style={styles.textButtonFilter}>+ de filtres</Text>
+          </TouchableOpacity>
         </View>
       </View>
-
-      <Modal
-        animationType='fade'
-        transparent={true}
-        visible={FilterModalVisible}
-        onRequestClose={() => setFilterModalVisible(false)}>
+    </View>
+{/* Filter modal*/}
+    <Modal
+      animationType='fade'
+      transparent={true}
+      visible={isFilterModalVisible}
+      onRequestClose={() => setIsFilterModalVisible(false)}
+    >
+      <TouchableWithoutFeedback onPress={() => setIsFilterModalVisible(false)}>
         <View style={styles.modal}>
           <View style={styles.modalView}>
-          <View style={styles.sectionCheckbox}>
-              <Text style={styles.checkboxText}>
-                Bar :
-              </Text>
+            <View style={styles.checkboxContainer}>
+              <Text style={styles.checkboxText}>Bar :</Text>
               <Checkbox
-                  style={styles.checkbox}
-                  />
-              <Text style={styles.checkboxText}>
-                Restaurant :
-              </Text>
+                style={styles.checkbox}
+                value={isCheckedBar}
+                onValueChange={() => setCheckedBar(isCheckedBar === '' ? 'Bar' : '')}
+                color={isCheckedBar !== '' ? '#E6DCEC' : undefined}
+              />
+              <Text style={styles.checkboxText}>Restaurant :</Text>
               <Checkbox
-                  style={styles.checkbox}
-                  />
-                  <Text style={styles.checkboxText}>
-                Favoris :
-              </Text>
+                style={styles.checkbox}
+                value={isCheckedRestaurant}
+                onValueChange={() => setCheckedRestaurant(isCheckedRestaurant === '' ? 'Restaurant' : '')}
+                color={isCheckedRestaurant !== '' ? '#E6DCEC' : undefined}
+              />
+              <Text style={styles.checkboxText}>Favoris :</Text>
               <Checkbox
-                  style={styles.checkbox}
-                  />
-                  <Text style={styles.checkboxText}>
-                Promotions :
-              </Text>
+                style={styles.checkbox}
+                value={isCheckedFavorite}
+                onValueChange={() => setCheckedFavorite(isCheckedFavorite === '' ? 'Favoris' : '')}
+                color={isCheckedFavorite !== '' ? '#E6DCEC' : undefined}
+              />
+              <Text style={styles.checkboxText}>Promotion :</Text>
               <Checkbox
-                  style={styles.checkbox}
-                  />
-                  <Text style={styles.checkboxText}>
-                Evènements :
-              </Text>
+                style={styles.checkbox}
+                value={isCheckedPromo}
+                onValueChange={() => setCheckedPromo(isCheckedPromo === '' ? 'Promotion' : '')}
+                color={isCheckedPromo !== '' ? '#E6DCEC' : undefined}
+              />
+              <Text style={styles.checkboxText}>Evènements :</Text>
               <Checkbox
-                  style={styles.checkbox}
-                  />
-              </View>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setFilterModalVisible(false)}>
-              <Text>Fermer</Text>
-            </TouchableOpacity>
+                style={styles.checkbox}
+                value={isCheckedEvent}
+                onValueChange={() => setCheckedEvent(isCheckedEvent === '' ? 'Evènement' : '')}
+                color={isCheckedEvent !== '' ? '#E6DCEC' : undefined}
+              />
+            </View>
           </View>
         </View>
-      </Modal>
-
+      </TouchableWithoutFeedback>
+    </Modal>
+{/* Etablishments button */}
       <View style={styles.etablishmentsContainer}>
-        <View style={styles.etablishments}>
+        <TouchableOpacity 
+          style={styles.etablishments}
+          activeOpacity={0.8}
+          onPress={() => setEtablishmentsModalVisible(true)}
+          >
           <Text style={styles.etablishmentsList}>
             Liste des établissements
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
+{/* Etablishments modal */}
+      <Modal
+        animationType='fade'
+        transparent={true}
+        visible={EtablishmentsModalVisible}
+        onRequestClose={() => setEtablishmentsModalVisible(false)}
+         >
+          <View style={styles.modal}>
+            <View style={styles.listModal}>
+              <Text 
+                style={styles.titleModal}
+                onPress={() => setEtablishmentsModalVisible(false)}
+              >Liste des établissements</Text>
+              <ScrollView style={styles.scrollList}>
+                <View>
+              <View 
+                style={styles.etablishmentCard}
+                onPress={() => setDescriptionModalVisible(true)}
+                >
+              <Image source={{ uri: imageUrl }} style={styles.image} />
+              <View style={styles.etablishmentInfo}>
+                <Text style={styles.etablishmentName}>Café Lovster</Text>
+                <Text style={styles.etablishmentDistance}>à 345 mètres</Text>
+                <Text style={styles.etablishmentNote}>Note Google: 3,9/5</Text>
+                <Text style={styles.etablishmentAdress}>3/3 Bis Boulevard Carnot, 59800 Lille</Text>
+                <Text style={styles.etablishmentPhone}>03 28 14 18</Text>
+                <Text style={styles.etablishmentEvent}>Happy hour de 18 à 20h</Text>
+                <Text style={styles.etablishmentEvent}>5 Euros la pinte</Text>
+                </View>
+              </View>
+              <View style={styles.etablishmentCard}>
+              <Image source={{ uri: imageUrl }} style={styles.image} />
+              <View style={styles.etablishmentInfo}>
+              <Text style={styles.etablishmentName}>Café Lovster</Text>
+                <Text style={styles.etablishmentDistance}>à 345 mètres</Text>
+                <Text style={styles.etablishmentNote}>Note Google: 3,9/5</Text>
+                <Text style={styles.etablishmentAdress}>3/3 Bis Boulevard Carnot, 59800 Lille</Text>
+                <Text style={styles.etablishmentPhone}>03 28 14 18</Text>
+                <Text style={styles.etablishmentEvent}>Happy hour de 18 à 20h</Text>
+                <Text style={styles.etablishmentEvent}>5 Euros la pinte</Text>
+                </View>
+              </View>
+              <View style={styles.etablishmentCard}>
+              <Image source={{ uri: imageUrl }} style={styles.image} />
+              <View style={styles.etablishmentInfo}>
+              <Text style={styles.etablishmentName}>Café Lovster</Text>
+                <Text style={styles.etablishmentDistance}>à 345 mètres</Text>
+                <Text style={styles.etablishmentNote}>Note Google: 3,9/5</Text>
+                <Text style={styles.etablishmentAdress}>3/3 Bis Boulevard Carnot, 59800 Lille</Text>
+                <Text style={styles.etablishmentPhone}>03 28 14 18</Text>
+                <Text style={styles.etablishmentEvent}>Happy hour de 18 à 20h</Text>
+                <Text style={styles.etablishmentEvent}>5 Euros la pinte</Text>
+                </View>
+              </View>
+              <View style={styles.etablishmentCard}>
+              <Image source={{ uri: imageUrl }} style={styles.image} />
+              <View style={styles.etablishmentInfo}>
+              <Text style={styles.etablishmentName}>Café Lovster</Text>
+                <Text style={styles.etablishmentDistance}>à 345 mètres</Text>
+                <Text style={styles.etablishmentNote}>Note Google: 3,9/5</Text>
+                <Text style={styles.etablishmentAdress}>3/3 Bis Boulevard Carnot, 59800 Lille</Text>
+                <Text style={styles.etablishmentPhone}>03 28 14 18</Text>
+                <Text style={styles.etablishmentEvent}>Happy hour de 18 à 20h</Text>
+                <Text style={styles.etablishmentEvent}>5 Euros la pinte</Text>
+                </View>
+              </View>
+              </View>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
+{/* Etablishment Description */}
+<Modal
+        animationType='fade'
+        transparent={false}
+        visible={DescriptionModalVisible}
+        onRequestClose={() => setDescriptionModalVisible(false)}
+         >
+          <View style={styles.descriptionModal}>
+            <Text>Café Lovster</Text>
+            <Text>Bar / Restaurant</Text>
+            <Text>Note Google : 3,9/5</Text>
+            <Text>3/3 bis Boulevard Carnot
+              59800 Lille
+              03 28 14 18
+            </Text>
+            <Text>Y aller !</Text>
+            <Text>Restaurant spécialisé dans les lobster rolls. Places assises, Sert de l'alcool, Cartes bancaires acceptées, Service de table.</Text>
+            <Text>Evènements en cours</Text>
+            <Text>Happy Hour de 18 à 20h</Text>
+            <Text>5 Euros la pinte</Text>
+          </View>
+        </Modal>
 
+{/* Mapview */}
       <MapView style={styles.map}
         initialRegion={{
           latitude: 50.637699,
@@ -133,7 +273,6 @@ export default function HomeScreen({ navigation }) {
     </View>
   )
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -232,8 +371,6 @@ const styles = StyleSheet.create({
   },
   modal: {
     flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0)',
   },
   modalView: {
@@ -253,32 +390,106 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: '#FF7337',
+    backgroundColor: '#E6DCEC',
     borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#E6DCEC',
+  },
+  closeText: {
+    color: '#E6DCEC',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    marginTop: -20,
   },
   checkbox: {
-    height: 15,
-    width: 15,
+    height: 20,
+    width: 20,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#D3CCD8',
-    marginRight: 30,
-    marginLeft: 5,
+    marginRight: 20,
+    marginTop: 15,
+    marginBottom: 5,
   },
-  sectionCheckbox: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: -20,
-    marginLeft: 10,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    
-   },
   checkboxText: {
     color: '#E6DCEC',
     fontSize: 15,
+  },
+  listModal: {
+    backgroundColor: '#8440B4',
+    paddingTop: 35,
+    alignItems: 'center',
+    elevation: 5,
+    marginTop: 155,
+    height: '75%',
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+  },
+  titleModal: {
+    color: '#FFF',
+    fontSize: 20,
+    fontFamily: 'Quicksand-SemiBold',
+    marginTop: -15,
     marginBottom: 20,
-
+  },
+  etablishmentCard: {
+    flexDirection: 'row',
+    backgroundColor: '#FFF',
+    borderBottomWidth: 1,
+    borderColor: '#D7D7E5',
+    padding: 8,
+  },
+  image: {
+    width: 135,
+    height: 190,
+  },
+  etablishmentInfo: {
+    padding: 10,
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  scrollList: {
+    width: '100%',
+    height: 200,
+  },
+  etablishmentName: {
+    color: '#8440B4',
+    fontSize: 16,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  etablishmentAdress: {
+    color: '#321C3C',
+    fontSize: 12,
+    fontFamily: 'Quicksand-Regular',
+  },
+  etablishmentDistance:{
+    color: '#321C3C',
+    fontSize: 13,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  etablishmentEvent: {
+    color: '#FF7337',
+    fontSize: 15,
+    fontFamily: 'Quicksand-Bold',
+  },
+  etablishmentPhone: {
+    color: '#321C3C',
+    fontSize: 12,
+    fontFamily: 'Quicksand-Regular',
+  },
+  etablishmentNote: {
+    color: '#321C3C',
+    fontSize: 12,
+    fontFamily: 'Quicksand-Regular',
+  },
+  descriptionModal: {
+    backgroundColor: '#FFF',
+    width: 300,
+    height: 200,
   }
   
 
