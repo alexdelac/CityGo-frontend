@@ -9,6 +9,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
 import MapView, { Marker } from 'react-native-maps';
 import { useEffect, useState } from 'react';
@@ -22,7 +23,6 @@ export default function HomeScreen({ navigation }) {
   const [currentPosition, setCurrentPosition] = useState(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [EtablishmentsModalVisible, setEtablishmentsModalVisible] = useState(false);
-  const [DescriptionModalVisible, setDescriptionModalVisible] = useState(false);
   const [isCheckedEvent, setCheckedEvent] = useState('');
   const [isCheckedBar, setCheckedBar] = useState('');
   const [isCheckedRestaurant, setCheckedRestaurant] = useState('');
@@ -30,7 +30,6 @@ export default function HomeScreen({ navigation }) {
   const [isCheckedPromo, setCheckedPromo] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(null);
-  const imageUrl = 'https://lille.citycrunch.fr/wp-content/uploads/sites/6/2020/09/lovster_bar_lille_-1024x654.jpg';
 
   const [fontsLoaded] = useFonts({
     'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
@@ -181,11 +180,15 @@ const handleConfirm = (date) => {
               >Liste des établissements</Text>
               <ScrollView style={styles.scrollList}>
                 <View>
+              
               <View 
                 style={styles.etablishmentCard}
-                onPress={() => setDescriptionModalVisible(true)}
+                
                 >
-              <Image source={{ uri: imageUrl }} style={styles.image} />
+              <Image style={styles.image} source={require('../assets/LovsterImage.jpeg')} />
+              <TouchableOpacity onPress={() => {
+                setEtablishmentsModalVisible(false);
+                navigation.navigate('Description')}}>
               <View style={styles.etablishmentInfo}>
                 <Text style={styles.etablishmentName}>Café Lovster</Text>
                 <Text style={styles.etablishmentDistance}>à 345 mètres</Text>
@@ -195,9 +198,14 @@ const handleConfirm = (date) => {
                 <Text style={styles.etablishmentEvent}>Happy hour de 18 à 20h</Text>
                 <Text style={styles.etablishmentEvent}>5 Euros la pinte</Text>
                 </View>
+                </TouchableOpacity>
+                  <View style={styles.etablishmentFavorite}>
+                    <FontAwesome name='star' color={'#D7D7E5'} size={25} />
+                  </View>
               </View>
+              
               <View style={styles.etablishmentCard}>
-              <Image source={{ uri: imageUrl }} style={styles.image} />
+              <Image style={styles.image} source={require('../assets/LovsterImage.jpeg')} />
               <View style={styles.etablishmentInfo}>
               <Text style={styles.etablishmentName}>Café Lovster</Text>
                 <Text style={styles.etablishmentDistance}>à 345 mètres</Text>
@@ -207,9 +215,12 @@ const handleConfirm = (date) => {
                 <Text style={styles.etablishmentEvent}>Happy hour de 18 à 20h</Text>
                 <Text style={styles.etablishmentEvent}>5 Euros la pinte</Text>
                 </View>
+                  <View style={styles.etablishmentFavorite}>
+                    <FontAwesome name='star' color={'#D7D7E5'} size={25} />
+                  </View>
               </View>
               <View style={styles.etablishmentCard}>
-              <Image source={{ uri: imageUrl }} style={styles.image} />
+              <Image style={styles.image} source={require('../assets/LovsterImage.jpeg')} />
               <View style={styles.etablishmentInfo}>
               <Text style={styles.etablishmentName}>Café Lovster</Text>
                 <Text style={styles.etablishmentDistance}>à 345 mètres</Text>
@@ -219,9 +230,12 @@ const handleConfirm = (date) => {
                 <Text style={styles.etablishmentEvent}>Happy hour de 18 à 20h</Text>
                 <Text style={styles.etablishmentEvent}>5 Euros la pinte</Text>
                 </View>
+                  <View style={styles.etablishmentFavorite}>
+                    <FontAwesome name='star' color={'#D7D7E5'} size={25} />
+                  </View>
               </View>
               <View style={styles.etablishmentCard}>
-              <Image source={{ uri: imageUrl }} style={styles.image} />
+              <Image style={styles.image} source={require('../assets/LovsterImage.jpeg')} />
               <View style={styles.etablishmentInfo}>
               <Text style={styles.etablishmentName}>Café Lovster</Text>
                 <Text style={styles.etablishmentDistance}>à 345 mètres</Text>
@@ -231,32 +245,13 @@ const handleConfirm = (date) => {
                 <Text style={styles.etablishmentEvent}>Happy hour de 18 à 20h</Text>
                 <Text style={styles.etablishmentEvent}>5 Euros la pinte</Text>
                 </View>
+                  <View style={styles.etablishmentFavorite}>
+                    <FontAwesome name='star' color={'#D7D7E5'} size={25} />
+                  </View>
               </View>
               </View>
               </ScrollView>
             </View>
-          </View>
-        </Modal>
-{/* Etablishment Description */}
-<Modal
-        animationType='fade'
-        transparent={false}
-        visible={DescriptionModalVisible}
-        onRequestClose={() => setDescriptionModalVisible(false)}
-         >
-          <View style={styles.descriptionModal}>
-            <Text>Café Lovster</Text>
-            <Text>Bar / Restaurant</Text>
-            <Text>Note Google : 3,9/5</Text>
-            <Text>3/3 bis Boulevard Carnot
-              59800 Lille
-              03 28 14 18
-            </Text>
-            <Text>Y aller !</Text>
-            <Text>Restaurant spécialisé dans les lobster rolls. Places assises, Sert de l'alcool, Cartes bancaires acceptées, Service de table.</Text>
-            <Text>Evènements en cours</Text>
-            <Text>Happy Hour de 18 à 20h</Text>
-            <Text>5 Euros la pinte</Text>
           </View>
         </Modal>
 
@@ -486,10 +481,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Quicksand-Regular',
   },
-  descriptionModal: {
-    backgroundColor: '#FFF',
-    width: 300,
-    height: 200,
+  etablishmentFavorite: {
+    marginLeft: 15,
+    marginTop: 10,
   }
   
 

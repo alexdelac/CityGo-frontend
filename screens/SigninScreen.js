@@ -13,7 +13,7 @@ import { useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useFonts } from 'expo-font'
 
-const BACKEND_ADDRESS = 'http://192.168.1.49:3000';
+const BACKEND_ADDRESS = 'http://10.1.2.64:3000';
 
 export default function SigninScreen({ navigation }) {
 

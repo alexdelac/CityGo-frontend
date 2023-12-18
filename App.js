@@ -9,6 +9,7 @@ import ProfilScreen from './screens/ProfilScreen';
 import SigninScreen from './screens/SigninScreen';
 import SignupScreen from './screens/SignupScreen';
 import TopdealsScreen from './screens/TopdealsScreen';
+import DescriptionScreen from './screens/DescriptionScreen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Provider } from 'react-redux';
 import user from './reducers/user';
@@ -88,6 +89,7 @@ export default function App() {
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="Signin" component={SigninScreen} />
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="Description" component={DescriptionScreen} />
           <Stack.Screen name="TabNavigator" component={TabNavigator} />
 
         </Stack.Navigator>
