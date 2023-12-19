@@ -18,25 +18,31 @@ import Checkbox from 'expo-checkbox';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { format } from 'date-fns';
 import * as Location from 'expo-location';
-import {useSelector} from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { changeLike } from '../reducers/user'
 
 export default function HomeScreen({ navigation }) {
 
   const [currentPosition, setCurrentPosition] = useState(null);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [EtablishmentsModalVisible, setEtablishmentsModalVisible] = useState(false);
-  const [isCheckedEvent, setCheckedEvent] = useState('');
-  const [isCheckedBar, setCheckedBar] = useState('');
-  const [isCheckedRestaurant, setCheckedRestaurant] = useState('');
-  const [isCheckedFavorite, setCheckedFavorite] = useState('');
-  const [isCheckedPromo, setCheckedPromo] = useState('');
+  const [isCheckedEvent, setCheckedEvent] = useState(false);
+  const [isCheckedBar, setCheckedBar] = useState(false);
+  const [isCheckedRestaurant, setCheckedRestaurant] = useState(false);
+  const [isCheckedFavorite, setCheckedFavorite] = useState(false);
+  const [isCheckedPromo, setCheckedPromo] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState(null);
+  const [selectedStartDate, setSelectedStartDate] = useState(new Date());
   const [date, setDate] = useState(new Date())
   const [eventsData, setEventsData] = useState(null)
-  const [like, setLike]=useState(false)
+
+  console.log(selectedStartDate)
+
+
 
   const user = useSelector((state) => state.user.value)
+  const like = useSelector((state) => state.user.like)
+  const dispatch = useDispatch()
 
   const [fontsLoaded] = useFonts({
     'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
@@ -66,7 +72,7 @@ export default function HomeScreen({ navigation }) {
             fetch('http://10.1.1.249:3000/events/display', {
               method: 'POST',
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ latitude: location.coords.latitude, longitude: location.coords.longitude, date: date, token: user.token }),
+              body: JSON.stringify({ latitude: location.coords.latitude, longitude: location.coords.longitude, date: selectedStartDate, token: user.token }),
             })
               .then(response => response.json())
               .then(data => {
@@ -76,33 +82,63 @@ export default function HomeScreen({ navigation }) {
           });
       }
     })();
-  }, [like]);
+  }, [like, selectedStartDate]);
 
-  const handleLike = (id)=>{
+  const handleLike = (id) => {
     fetch('http://10.1.1.249:3000/users/like', {
-              method: 'POST',
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ token: user.token, etablissementId: id }),
-            })
-            .then(response=>response.json())
-            .then(data=>{
-              console.log(data)
-              setLike(!like)
-            })
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: user.token, etablissementId: id }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+
+        dispatch(changeLike())
+      })
   }
 
   let event
   let eventList
+
   if (eventsData) {
-    event = eventsData.map((data, i) => {
+
+
+    // filtrage Events
+    let filteredData = eventsData
+
+    if (isCheckedFavorite) {
+      filteredData = eventsData.filter(e => e.etablissement.isLiked === true)
+    } else {
+      filteredData = filteredData
+    }
+    if (isCheckedPromo && isCheckedEvent) {
+      filteredData = filteredData
+    } else if (isCheckedPromo) {
+      filteredData = filteredData.filter(e => e.type.includes('Promotion'))
+    } else if (isCheckedEvent) {
+      filteredData = filteredData.filter(e => e.type.includes('Evènement'))
+    } else {
+      filteredData = filteredData
+    }
+    if (isCheckedBar) {
+      filteredData = filteredData.filter(e => e.etablissement.type.includes('Bar'))
+    } else if (isCheckedRestaurant) {
+      filteredData = filteredData.filter(e => e.etablissement.type.includes('Restaurant'))
+    } else {
+      filteredData = filteredData
+    }
+
+
+    event = filteredData.map((data, i) => {
       const latitude = data.etablissement.localisation.coordinates[1]
       const longitude = data.etablissement.localisation.coordinates[0]
       return <Marker key={i} coordinate={{ latitude, longitude }} title={data.etablissement.name} pinColor='#8440B4' />
     })
-    eventList = eventsData.map((data, i) => {
+    eventList = filteredData.map((data, i) => {
       return (
         <View key={i} style={styles.etablishmentCard}>
-          <Image style={styles.image} source={{uri: data.etablissement.photos[0]}} />
+          <Image style={styles.image} source={{ uri: data.etablissement.photos[0] }} />
           <TouchableOpacity onPress={() => {
             setEtablishmentsModalVisible(false);
             navigation.navigate('Description', {
@@ -111,7 +147,7 @@ export default function HomeScreen({ navigation }) {
           }}>
             <View style={styles.etablishmentInfo}>
               <Text style={styles.etablishmentName}>{data.etablissement.name}</Text>
-              <Text style={styles.etablishmentDistance}>à XXX mètres</Text>
+              <Text style={styles.etablishmentDistance}>à {data.etablissement.distance} mètres</Text>
               <Text style={styles.etablishmentNote}>Note Google: 3,9/5</Text>
               <Text style={styles.etablishmentAdress}>{data.etablissement.adresse}</Text>
               <Text style={styles.etablishmentPhone}>{data.etablissement.telephone}</Text>
@@ -120,7 +156,7 @@ export default function HomeScreen({ navigation }) {
             </View>
           </TouchableOpacity>
           <View style={styles.etablishmentFavorite}>
-            <FontAwesome name='star' color={data.etablissement.isLiked?'#8440B4':'#D7D7E5'} size={25} onPress={()=>handleLike(data.etablissement.id)}/>
+            <FontAwesome name='star' color={data.etablissement.isLiked ? '#8440B4' : '#D7D7E5'} size={25} onPress={() => handleLike(data.etablissement.id)} />
           </View>
         </View>
       )
@@ -146,7 +182,7 @@ export default function HomeScreen({ navigation }) {
             <TextInput
               placeholder='Quand ?'
               onFocus={showDatePicker}
-              value={selectedStartDate ? format(selectedStartDate, 'dd/MM/yy HH:mm') : ''}
+              // value={selectedStartDate ? format(selectedStartDate, 'dd/MM/yy HH:mm') : ''}
               style={styles.filterWhen}
             />
             <DateTimePickerModal
@@ -183,35 +219,35 @@ export default function HomeScreen({ navigation }) {
                 <Checkbox
                   style={styles.checkbox}
                   value={isCheckedBar}
-                  onValueChange={() => setCheckedBar(isCheckedBar === '' ? 'Bar' : '')}
+                  onValueChange={() => setCheckedBar(isCheckedBar === false ? true : false)}
                   color={isCheckedBar !== '' ? '#E6DCEC' : undefined}
                 />
                 <Text style={styles.checkboxText}>Restaurant :</Text>
                 <Checkbox
                   style={styles.checkbox}
                   value={isCheckedRestaurant}
-                  onValueChange={() => setCheckedRestaurant(isCheckedRestaurant === '' ? 'Restaurant' : '')}
+                  onValueChange={() => setCheckedRestaurant(isCheckedRestaurant === false ? true : false)}
                   color={isCheckedRestaurant !== '' ? '#E6DCEC' : undefined}
                 />
                 <Text style={styles.checkboxText}>Favoris :</Text>
                 <Checkbox
                   style={styles.checkbox}
                   value={isCheckedFavorite}
-                  onValueChange={() => setCheckedFavorite(isCheckedFavorite === '' ? 'Favoris' : '')}
+                  onValueChange={() => setCheckedFavorite(isCheckedFavorite === false ? true : false)}
                   color={isCheckedFavorite !== '' ? '#E6DCEC' : undefined}
                 />
                 <Text style={styles.checkboxText}>Promotion :</Text>
                 <Checkbox
                   style={styles.checkbox}
                   value={isCheckedPromo}
-                  onValueChange={() => setCheckedPromo(isCheckedPromo === '' ? 'Promotion' : '')}
+                  onValueChange={() => setCheckedPromo(isCheckedPromo === false ? true : false)}
                   color={isCheckedPromo !== '' ? '#E6DCEC' : undefined}
                 />
                 <Text style={styles.checkboxText}>Evènements :</Text>
                 <Checkbox
                   style={styles.checkbox}
                   value={isCheckedEvent}
-                  onValueChange={() => setCheckedEvent(isCheckedEvent === '' ? 'Evènement' : '')}
+                  onValueChange={() => setCheckedEvent(isCheckedEvent === false ? true : false)}
                   color={isCheckedEvent !== '' ? '#E6DCEC' : undefined}
                 />
               </View>

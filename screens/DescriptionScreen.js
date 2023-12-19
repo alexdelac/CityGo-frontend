@@ -76,7 +76,8 @@
         </Swiper>
         <View style={styles.favorite}>
           <Text style={styles.h2}>{eventData.etablissement.name}</Text>
-          <FontAwesome name='star' color={'#D7D7E5'} size={30} style={styles.star}
+          <FontAwesome name='star' color={isLiked?'#8440B4':'#D7D7E5'} size={30} style={styles.star}
+          onPress={()=>handleLike(eventData.etablissement.id)}
           />
         </View>
         <View style={styles.etablishmentCard}>
