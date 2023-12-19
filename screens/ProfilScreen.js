@@ -1,17 +1,19 @@
-import {  KeyboardAvoidingView, 
-          Platform, 
-          StyleSheet, 
-          Text, 
-          TextInput, 
-          TouchableOpacity, 
-          View, 
-          Modal } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Modal
+} from 'react-native';
 import { useFonts } from 'expo-font';
-import { logout } from '../reducers/user';
+import { logout, updatePseudo } from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 
-const BACKEND_ADDRESS = 'http://192.168.1.49:3000';
+const BACKEND_ADDRESS = 'http://192.168.1.60:3000';
 
 export default function ProfilScreen({ navigation }) {
 
@@ -23,8 +25,13 @@ export default function ProfilScreen({ navigation }) {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isFocused, setIsFocused] = useState(false)
-  const [updatePassword, setUpdatePassword] = useState('');
   const [error, setError] = useState(null);
+  const [newEmail, setNewEmail] = useState('');
+  const [newPseudo, setNewPseudo] = useState('');
+  const [newInfoModalVisible, setNewInfoModalVisible] = useState(false);
+  const [newValidModalVisible, setNewValidModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [token, setToken] = useState('');
 
   const [fontsLoaded] = useFonts({
     'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
@@ -56,30 +63,154 @@ export default function ProfilScreen({ navigation }) {
       })
   };
 
+  const handleUpdateInfo = () => {
+    fetch(`${BACKEND_ADDRESS}/users/updateInfo`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: user.token, pseudonyme: newPseudo, email: newEmail }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result) {
+          dispatch(updatePseudo(newPseudo))
+          setNewInfoModalVisible(false)
+          setNewValidModalVisible(true)
+        } else {
+          setError(data.error)
+        }
+      })
+  };
+
+  const handleDelete = () => {
+    fetch(`${BACKEND_ADDRESS}/users/deleteAccount`, {
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ token: user.token }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        if (data.result) {
+          dispatch(logout())
+          setDeleteModalVisible(true)
+        } else {
+          setError(data.error)
+        }
+      })
+  };
+
+
+
   if (!fontsLoaded) {
     return null
   }
 
   return (
-  
-  <View style={styles.container}>
-    <Text style={styles.title}>Mon Profil</Text>
-    <View style={styles.infosContainer}>
-      <View style={styles.infosText}>
-        <Text style={styles.titleText}>Pseudonyme : </Text>
-        <Text style={styles.userText}>{user.pseudonyme}</Text>
+
+    <View style={styles.container}>
+      <Text style={styles.title}>Mon Profil</Text>
+      <View style={styles.infosContainer}>
+        <View style={styles.infosText}>
+          <Text style={styles.titleText}>Pseudonyme : </Text>
+          <Text style={styles.userText}>{user.pseudonyme}</Text>
+        </View>
+        <View style={styles.infosBottomText}>
+          <Text style={styles.titleText}>E-mail : </Text>
+          <Text style={styles.userText}>{newEmail}</Text>
+        </View>
+        <TouchableOpacity onPress={() => setNewInfoModalVisible(!modalVisible)} style={styles.button} activeOpacity={0.8}>
+          <Text style={styles.textButton}>Modifier mes informations</Text>
+        </TouchableOpacity>
+        <Modal
+          animationType='slide'
+          transparent={true}
+          visible={newInfoModalVisible}
+          onRequestClose={() => {
+            setNewInfoModalVisible(!newInfoModalVisible);
+          }}>
+          <KeyboardAvoidingView
+            style={styles.modal}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+
+            <View style={styles.modalView}>
+              <Text style={styles.h2Modal}>
+                Modifier mes informations
+              </Text>
+              {isFocused === 'Nouveau pseudonyme' && <Text style={styles.inputLabelOldPassword}>Nouveau pseudonyme</Text>}
+              <TextInput
+                onFocus={() => setIsFocused('Nouveau pseudonyme')}
+                onBlur={() => setIsFocused(false)}
+                autoCapitalize='none'
+                value={newPseudo}
+                onChangeText={(value) => setNewPseudo(value)}
+                style={[styles.input, isFocused === 'Nouveau pseudonyme' && styles.inputIsFocused]}
+                placeholderTextColor={'#D7D7E5'}
+                placeholder={isFocused === 'Nouveau pseudonyme' ? '' : 'Nouveau pseudonyme'}
+              />
+
+              {isFocused === 'Nouvel E-mail' && <Text style={styles.inputLabelNewPassword}>Nouvel E-mail</Text>}
+              <TextInput
+                onFocus={() => setIsFocused('Nouvel E-mail')}
+                onBlur={() => setIsFocused(false)}
+                autoCapitalize='none'
+                value={newEmail}
+                onChangeText={(value) => setNewEmail(value)}
+                style={[styles.input, isFocused === 'Nouvel E-mail' && styles.inputIsFocused]}
+                placeholderTextColor={'#D7D7E5'}
+                placeholder={isFocused === 'Nouvel E-mail' ? '' : 'Nouvel E-mail'} />
+
+              {error && <Text style={styles.error}>{error}</Text>}
+
+              <TouchableOpacity
+                style={styles.button1}
+                activeOpacity={0.8}
+                onPress={() => handleUpdateInfo()}>
+                <Text style={styles.textButton1}>
+                  Valider
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.button2}
+                activeOpacity={0.8}
+                onPress={() => setNewInfoModalVisible(false)} >
+                <Text style={styles.textButton2}>
+                  Retour
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
+        <Modal
+          animationType='slide'
+          transparent={true}
+          visible={newValidModalVisible}
+          onRequestClose={() => {
+            setNewValidModalVisible(!newValidModalVisible);
+          }}>
+          <View style={styles.modal}>
+            <View style={styles.modalView}>
+
+              <Text style={styles.h2Modal}>
+                Modifier mes informations
+              </Text>
+              <Text style={styles.modalViewText}>informations changées !</Text>
+              <TouchableOpacity
+                style={styles.button}
+                activeOpacity={0.8}
+                onPress={() => setNewValidModalVisible(false)} >
+                <Text style={styles.textButton}>
+                  OK
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={styles.button} activeOpacity={0.8}>
+          <Text style={styles.textButton}>Changer de mot de passe</Text>
+        </TouchableOpacity>
       </View>
-      <View style={styles.infosBottomText}>
-        <Text style={styles.titleText}>E-mail : </Text>
-        <Text style={styles.userText}>{user.mail}</Text>
-      </View>
-      <TouchableOpacity style={styles.button} activeOpacity={0.8}>
-        <Text style={styles.textButton}>Modifier mes informations</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={styles.button} activeOpacity={0.8}>
-        <Text style={styles.textButton}>Changer de mot de passe</Text>
-      </TouchableOpacity>
-    </View> 
 
       {/* Modal to allow user to change his/her password */}
       <Modal
@@ -183,14 +314,38 @@ export default function ProfilScreen({ navigation }) {
         </View>
       </Modal>
       <View style={styles.bottomButtons}>
-      <TouchableOpacity style={styles.deconnectbutton} activeOpacity={0.8} onPress={() => handleLogout()}>
-        <Text style={styles.textdeconnectButton}>Se déconnecter</Text>
-      </TouchableOpacity>
-      <TouchableOpacity>
-        <Text style={styles.deleteLink}>Supprimer le compte</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.deconnectbutton} activeOpacity={0.8} onPress={() => handleLogout()}>
+          <Text style={styles.textdeconnectButton}>Se déconnecter</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleDelete()}>
+          <Text style={styles.deleteLink}>Supprimer le compte</Text>
+        </TouchableOpacity>
       </View>
-    
+      <Modal
+        animationType='slide'
+        transparent={true}
+        visible={deleteModalVisible}
+        onRequestClose={() => {
+          setDeleteModalVisible(!deleteModalVisible);
+        }}>
+        <View style={styles.modal}>
+          <View style={styles.modalView}>
+
+            <Text style={styles.h2Modal}>
+              Suppression du compte
+            </Text>
+            <Text style={styles.modalViewText}>Compte supprimé !</Text>
+            <TouchableOpacity
+              style={styles.button}
+              activeOpacity={0.8}
+              onPress={() => setDeleteModalVisible(false)} >
+              <Text style={styles.textButton}>
+                OK
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   )
 };
