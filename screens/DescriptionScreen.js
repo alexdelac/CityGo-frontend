@@ -3,78 +3,110 @@
     View,
     Text,
     Image,
-    TouchableOpacity
+    ScrollView,
+    Linking,
+    Platform,
+    TouchableOpacity,
   } from 'react-native';
   import FontAwesome from 'react-native-vector-icons/FontAwesome';
   import Swiper from 'react-native-swiper';
   import {useFonts} from 'expo-font';
+  import {useSelector} from 'react-redux'
+  import { useState } from 'react';
 
-  export default function DescriptionScreen({ navigation }) {
+  export default function DescriptionScreen({route, navigation }) {
+    
+    const user = useSelector((state) => state.user.value)
 
-  // Fonts import
-  const [fontsLoaded] = useFonts({
-    'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
-    'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
-  });
-  if(!fontsLoaded){
+    const {eventData} = route.params //stock la data envoyé dans le route params a la redirection
+    // Fonts import
+
+    const [isLiked, setIsliked]=useState(eventData.etablissement.isLiked)
+
+    const [fontsLoaded] = useFonts({
+      'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
+      'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
+    });
+    // fonction prenant la latitude et longitude envoyé dans le eventData pour redirection vers google maps
+    const handleOpenNavigation = ()=>{
+      let url =''
+      if (Platform.OS === 'ios'){
+        url = `http://maps.apple.com/?daddr=${eventData.etablissement.localisation.coordinates[1]},${eventData.etablissement.localisation.coordinates[0]}`
+      } else {
+        url = `http://maps.google.com/?daddr=${eventData.etablissement.localisation.coordinates[1]},${eventData.etablissement.localisation.coordinates[0]}`
+      }
+      
+      Linking.openURL(url)
+    }
+
+    const handleLike = (id)=>{
+      fetch('http://10.1.1.249:3000/users/like', {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token: user.token, etablissementId: id }),
+              })
+              .then(response=>response.json())
+              .then(data=>{
+                console.log(data)
+                setIsliked(!isLiked)
+              })
+    }
+    
+
+    if(!fontsLoaded){
     return null
-  }
-  // swiper pics
-  const images = [
-    require('../assets/LovsterImage.jpeg'),
-    require('../assets/LovsterImage.jpeg'),
-    require('../assets/LovsterImage.jpeg'),
-  ];
-  
-  return (
-  
-  <View style={styles.container} >
-    <Swiper
-      style={styles.swiper}
-      loop={false}
-      showsPagination={true}
-      dotStyle={styles.dot}
-      activeDotStyle={styles.activeDot}
-      paginationStyle={styles.paginationStyle}
-    >
-      {images.map((image, index) => (
-      <View key={index} style={styles.slide}>
-        <Image source={image} style={styles.image} />
-      </View>
-      ))}
-    </Swiper>
-    <View style={styles.favorite}>
-      <Text style={styles.h2}>Café Lovster</Text>
-      <FontAwesome name='star' color={'#D7D7E5'} size={30} style={styles.star}
-      />
-    </View>
-    <View style={styles.etablishmentCard}>
-      <Text style={styles.type}>Bar / Restaurant</Text>
-      <Text style={styles.note}>Note Google: 3,9/5</Text>
-      <Text style={styles.adress}>3/3 Bis Boulevard Carnot</Text>
-      <Text style={styles.adress}>59800 Lille</Text>
-      <Text style={styles.adress}>03 28 14 18 74</Text>
-      <View style={styles.itineraryContent}>
-      <FontAwesome name='location-arrow' color={'#FF7337'} size={30}
-        />
-        <Text style={styles.itinerary}>Y aller !</Text>
-      </View>
-      <Text style={styles.description}>Restaurant spécialisé dans les lobster rolls. Places assises, Sert de l'alcool, Cartes bancaires acceptées, Service de table.</Text>
-      <Text style={styles.currentEvent}>Evènements en cours</Text>
-      <Text style={styles.event}>Happy Hour de 18 à 20h</Text>
-      <Text style={styles.event}>5 Euros la pinte</Text>
-    </View>
-    <View style={styles.return}>
-    <TouchableOpacity
+    }
+    
+    return (
+    
+      <View style={styles.container} >
+        <Swiper
+          style={styles.swiper}
+          loop={false}
+          showsPagination={true}
+          dotStyle={styles.dot}
+          activeDotStyle={styles.activeDot}
+          paginationStyle={styles.paginationStyle}
+        >
+          {eventData.etablissement.photos.map((image, index) => (
+          <View key={index} style={styles.slide}>
+            <Image source={{uri: image}} style={styles.image} />
+          </View>
+          ))}
+        </Swiper>
+        <View style={styles.favorite}>
+          <Text style={styles.h2}>{eventData.etablissement.name}</Text>
+          <FontAwesome name='star' color={'#D7D7E5'} size={30} style={styles.star}
+          />
+        </View>
+        <View style={styles.etablishmentCard}>
+          <Text style={styles.type}>{eventData.etablissement.type}</Text>
+          <Text style={styles.note}>Note Google: 3,9/5</Text>
+          <Text style={styles.adress}>{eventData.etablissement.adresse}</Text>
+          <Text style={styles.adress}>{eventData.etablissement.telephone}</Text>
+          <TouchableOpacity style={styles.itineraryContent} onPress={()=>handleOpenNavigation()}>
+            <FontAwesome name='location-arrow' color={'#FF7337'} size={30}
+            />
+            <Text style={styles.itinerary}>Y aller !</Text>
+          </TouchableOpacity>
+          <Text style={styles.description}>{eventData.etablissement.description}</Text>
+          <Text style={styles.currentEvent}>Evènements en cours :</Text>
+          <ScrollView style={styles.scrollEvent}>
+            <Text style={styles.event}>{eventData.title}</Text>
+            <Text style={styles.eventDescription}>{eventData.description}</Text>
+          </ScrollView>
+          <View style={styles.return}>
+            <TouchableOpacity
               style={styles.buttonReturn}
               activeOpacity={0.8}
               onPress={() => navigation.navigate('Welcome')} >
-              <Text style={styles.textButtonReturn}>
-                Retour
-              </Text>
+                <Text style={styles.textButtonReturn}>
+                  Retour
+                </Text>
             </TouchableOpacity>
-            </View>
-  </View>
+          </View>
+          </View>
+          </View>
 
       )
   };
@@ -83,8 +115,8 @@
     container: {
       flex: 1,
       backgroundColor: '#ffffff',
-      alignItems: 'stretch',
-      justifyContent: 'flex-start',
+      // alignItems: 'stretch',
+      // justifyContent: 'flex-start',
     },
     swiper: {
       height: 320,
@@ -121,12 +153,13 @@
       justifyContent: 'space-between',
       marginLeft: 18,
       marginRight: 20,
-      marginTop: 20,
+      marginTop: -230,
+      marginBottom: -10,
     },
     etablishmentCard: {
       flex: 1,
       padding: 20,
-      bottom: 245,
+      marginTop: -520,
     },
     type: {
       fontSize: 20,
@@ -141,7 +174,7 @@
       marginBottom: 15,
     },
     adress: {
-      fontSize: 20,
+      fontSize: 18,
       color: '#341C42',
       fontFamily: 'Quicksand-Regular',
     },
@@ -156,7 +189,7 @@
       marginLeft: 10,
     },
     description: {
-      fontSize: 20,
+      fontSize: 18,
       color: '#321C3C',
       fontFamily: 'Quicksand-Regular',
       marginTop: 20,
@@ -173,10 +206,14 @@
       color: '#8440B4',
       fontFamily: 'Quicksand-Bold',
     },
+    eventDescription: {
+      fontSize: 16,
+      color: '#8440B4',
+      fontFamily: 'Quicksand-SemiBold',
+    },
     return: {
       alignItems: 'center',
       justifyContent: 'flex-end',
-      marginBottom: 40,
     },
     buttonReturn: {
       backgroundColor: '#FFF',
@@ -187,11 +224,17 @@
       width: 285,
       justifyContent: 'center',
       alignItems: 'center',
+      bottom: 30,
     },
     textButtonReturn: {
       color: '#8440B4',
       fontSize: 24,
       fontFamily: 'Quicksand-SemiBold',
     },
+    scrollEvent: {
+      flex: 1,
+      width: '100%',
+      height: 100,
+    }
     
   });

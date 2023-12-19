@@ -18,6 +18,7 @@ import Checkbox from 'expo-checkbox';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { format } from 'date-fns';
 import * as Location from 'expo-location';
+import {useSelector} from 'react-redux'
 
 export default function HomeScreen({ navigation }) {
 
@@ -33,6 +34,9 @@ export default function HomeScreen({ navigation }) {
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [date, setDate] = useState(new Date())
   const [eventsData, setEventsData] = useState(null)
+  const [like, setLike]=useState(false)
+
+  const user = useSelector((state) => state.user.value)
 
   const [fontsLoaded] = useFonts({
     'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
@@ -62,7 +66,7 @@ export default function HomeScreen({ navigation }) {
             fetch('http://10.1.1.249:3000/events/display', {
               method: 'POST',
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ latitude: location.coords.latitude, longitude: location.coords.longitude, date: date }),
+              body: JSON.stringify({ latitude: location.coords.latitude, longitude: location.coords.longitude, date: date, token: user.token }),
             })
               .then(response => response.json())
               .then(data => {
@@ -72,7 +76,20 @@ export default function HomeScreen({ navigation }) {
           });
       }
     })();
-  }, []);
+  }, [like]);
+
+  const handleLike = (id)=>{
+    fetch('http://10.1.1.249:3000/users/like', {
+              method: 'POST',
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token: user.token, etablissementId: id }),
+            })
+            .then(response=>response.json())
+            .then(data=>{
+              console.log(data)
+              setLike(!like)
+            })
+  }
 
   let event
   let eventList
@@ -88,7 +105,9 @@ export default function HomeScreen({ navigation }) {
           <Image style={styles.image} source={{uri: data.etablissement.photos[0]}} />
           <TouchableOpacity onPress={() => {
             setEtablishmentsModalVisible(false);
-            navigation.navigate('Description')
+            navigation.navigate('Description', {
+              eventData: data
+            })
           }}>
             <View style={styles.etablishmentInfo}>
               <Text style={styles.etablishmentName}>{data.etablissement.name}</Text>
@@ -101,7 +120,7 @@ export default function HomeScreen({ navigation }) {
             </View>
           </TouchableOpacity>
           <View style={styles.etablishmentFavorite}>
-            <FontAwesome name='star' color={'#D7D7E5'} size={25} />
+            <FontAwesome name='star' color={data.etablissement.isLiked?'#8440B4':'#D7D7E5'} size={25} onPress={()=>handleLike(data.etablissement.id)}/>
           </View>
         </View>
       )
@@ -413,7 +432,7 @@ const styles = StyleSheet.create({
   },
   etablishmentCard: {
     flexDirection: 'row',
-    width: '100vw',
+    width: '100%',
     backgroundColor: '#FFF',
     borderBottomWidth: 1,
     borderColor: '#D7D7E5',
