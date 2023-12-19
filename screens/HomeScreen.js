@@ -88,7 +88,9 @@ export default function HomeScreen({ navigation }) {
           <Image style={styles.image} source={{uri: data.etablissement.photos[0]}} />
           <TouchableOpacity onPress={() => {
             setEtablishmentsModalVisible(false);
-            navigation.navigate('Description')
+            navigation.navigate('Description', {
+              eventData: data
+            })
           }}>
             <View style={styles.etablishmentInfo}>
               <Text style={styles.etablishmentName}>{data.etablissement.name}</Text>

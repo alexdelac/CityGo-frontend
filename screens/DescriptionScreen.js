@@ -3,68 +3,80 @@
     View,
     Text,
     Image,
+    ScrollView,
+    Linking,
+    Platform,
     TouchableOpacity
   } from 'react-native';
   import FontAwesome from 'react-native-vector-icons/FontAwesome';
   import Swiper from 'react-native-swiper';
   import {useFonts} from 'expo-font';
 
-  export default function DescriptionScreen({ navigation }) {
+  export default function DescriptionScreen({route, navigation }) {
 
-  // Fonts import
-  const [fontsLoaded] = useFonts({
-    'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
-    'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
-  });
-  if(!fontsLoaded){
+    const {eventData} = route.params //stock la data envoyé dans le route params a la redirection
+    // Fonts import
+    const [fontsLoaded] = useFonts({
+      'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
+      'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
+    });
+
+    // fonction prenant la latitude et longitude envoyé dans le eventData pour redirection vers google maps
+    const handleOpenNavigation = ()=>{
+      let url =''
+      if (Platform.OS === 'ios'){
+        url = `http://maps.apple.com/?daddr=${eventData.etablissement.localisation.coordinates[1]},${eventData.etablissement.localisation.coordinates[0]}`
+      } else {
+        url = `http://maps.google.com/?daddr=${eventData.etablissement.localisation.coordinates[1]},${eventData.etablissement.localisation.coordinates[0]}`
+      }
+      
+      Linking.openURL(url)
+    }
+    
+
+    if(!fontsLoaded){
     return null
-  }
-  // swiper pics
-  const images = [
-    require('../assets/LovsterImage.jpeg'),
-    require('../assets/LovsterImage.jpeg'),
-    require('../assets/LovsterImage.jpeg'),
-  ];
-  
-  return (
-  
-  <View style={styles.container} >
-    <Swiper
-      style={styles.swiper}
-      loop={false}
-      showsPagination={true}
-      dotStyle={styles.dot}
-      activeDotStyle={styles.activeDot}
-      paginationStyle={styles.paginationStyle}
-    >
-      {images.map((image, index) => (
-      <View key={index} style={styles.slide}>
-        <Image source={image} style={styles.image} />
-      </View>
-      ))}
-    </Swiper>
-    <View style={styles.favorite}>
-      <Text style={styles.h2}>Café Lovster</Text>
+    }
+
+    
+    
+
+    return (
+        <View style={styles.container} >
+            <Swiper
+        style={styles.swiper}
+        loop={false}
+        showsPagination={true}
+        dotStyle={styles.dot}
+        activeDotStyle={styles.activeDot}
+        paginationStyle={styles.paginationStyle}
+      >
+        {eventData.etablissement.photos.map((image, index) => (
+          <View key={index} style={styles.slide}>
+            <Image source={{uri: image}} style={styles.image} />
+          </View>
+        ))}
+      </Swiper>
+      <View style={styles.favorite}>
+      <Text style={styles.h2}>{eventData.etablissement.name}</Text>
       <FontAwesome name='star' color={'#D7D7E5'} size={30} style={styles.star}
-      />
-    </View>
-    <View style={styles.etablishmentCard}>
-      <Text style={styles.type}>Bar / Restaurant</Text>
-      <Text style={styles.note}>Note Google: 3,9/5</Text>
-      <Text style={styles.adress}>3/3 Bis Boulevard Carnot</Text>
-      <Text style={styles.adress}>59800 Lille</Text>
-      <Text style={styles.adress}>03 28 14 18 74</Text>
-      <View style={styles.itineraryContent}>
-      <FontAwesome name='location-arrow' color={'#FF7337'} size={30}
         />
-        <Text style={styles.itinerary}>Y aller !</Text>
       </View>
-      <Text style={styles.description}>Restaurant spécialisé dans les lobster rolls. Places assises, Sert de l'alcool, Cartes bancaires acceptées, Service de table.</Text>
-      <Text style={styles.currentEvent}>Evènements en cours</Text>
-      <Text style={styles.event}>Happy Hour de 18 à 20h</Text>
-      <Text style={styles.event}>5 Euros la pinte</Text>
-    </View>
-    <View style={styles.return}>
+            <View style={styles.etablishmentCard}>
+                <Text style={styles.type}>{eventData.etablissement.type}</Text>
+                <Text style={styles.note}>Note Google: 3,9/5</Text>
+                <Text style={styles.adress}>{eventData.etablissement.adresse}</Text>
+                <Text style={styles.adress}>{eventData.etablissement.telephone}</Text>
+                <TouchableOpacity style={styles.itineraryContent} onPress={()=>handleOpenNavigation()}>
+                    <FontAwesome name='location-arrow' color={'#FF7337'} size={30}
+                    />
+                    <Text style={styles.itinerary}>Y aller !</Text>
+                    </TouchableOpacity>
+                <Text style={styles.description}>{eventData.etablissement.description}</Text>
+                <Text style={styles.currentEvent}>Evènements en cours</Text>
+                <Text style={styles.event}>{eventData.title}</Text>
+                <Text style={styles.event}>{eventData.description}</Text>
+                <View style={styles.return}>
     <TouchableOpacity
               style={styles.buttonReturn}
               activeOpacity={0.8}
@@ -73,6 +85,7 @@
                 Retour
               </Text>
             </TouchableOpacity>
+            </View>
             </View>
   </View>
 
