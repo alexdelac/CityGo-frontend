@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   },
   etablishmentCard: {
     flexDirection: 'row',
-    width: '100vw',
+    width: '100%',
     backgroundColor: '#FFF',
     borderBottomWidth: 1,
     borderColor: '#D7D7E5',
