@@ -11,11 +11,18 @@
   import FontAwesome from 'react-native-vector-icons/FontAwesome';
   import Swiper from 'react-native-swiper';
   import {useFonts} from 'expo-font';
+  import {useSelector} from 'react-redux'
+  import { useState } from 'react';
 
   export default function DescriptionScreen({route, navigation }) {
+    
+    const user = useSelector((state) => state.user.value)
 
     const {eventData} = route.params //stock la data envoyé dans le route params a la redirection
     // Fonts import
+
+    const [isLiked, setIsliked]=useState(eventData.etablissement.isLiked)
+
     const [fontsLoaded] = useFonts({
       'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
       'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
@@ -31,6 +38,19 @@
       }
       
       Linking.openURL(url)
+    }
+
+    const handleLike = (id)=>{
+      fetch('http://10.1.1.249:3000/users/like', {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token: user.token, etablissementId: id }),
+              })
+              .then(response=>response.json())
+              .then(data=>{
+                console.log(data)
+                setIsliked(!isLiked)
+              })
     }
     
 
@@ -59,8 +79,9 @@
       </Swiper>
       <View style={styles.favorite}>
       <Text style={styles.h2}>{eventData.etablissement.name}</Text>
-      <FontAwesome name='star' color={'#D7D7E5'} size={30} style={styles.star}
-        />
+      <TouchableOpacity onPress={()=>handleLike(eventData.etablissement.id)}>
+        <FontAwesome name='star' color={isLiked?'#8440B4':'#D7D7E5'} size={30} style={styles.star}/>
+      </TouchableOpacity>
       </View>
             <View style={styles.etablishmentCard}>
                 <Text style={styles.type}>{eventData.etablissement.type}</Text>
@@ -139,7 +160,7 @@
     etablishmentCard: {
       flex: 1,
       padding: 20,
-      bottom: 245,
+      bottom: Platform.OS=== 'ios'?245: 145,
     },
     type: {
       fontSize: 20,
