@@ -3,6 +3,9 @@
         View,
         Text,
         Image,
+        ScrollView,
+        Linking,
+        Platform,
     } from 'react-native';
   import FontAwesome from 'react-native-vector-icons/FontAwesome';
   import Swiper from 'react-native-swiper';
@@ -11,25 +14,32 @@
 
   
 
-  export default function DescriptionScreen({ navigation }) {
+  export default function DescriptionScreen({route, navigation }) {
 
-    
+    const {eventData} = route.params //stock la data envoyé dans le route params a la redirection
+    console.log(eventData)
     const [fontsLoaded] = useFonts({
       'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
       'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
     });
+
+    // fonction prenant la latitude et longitude envoyé dans le eventData pour redirection vers google maps
+    const handleOpenNavigation = ()=>{
+      let url =''
+      if (Platform.OS === 'ios'){
+        url = `http://maps.apple.com/?daddr=${eventData.etablissement.localisation.coordinates[1]},${eventData.etablissement.localisation.coordinates[0]}`
+      } else {
+        url = `http://maps.google.com/?daddr=${eventData.etablissement.localisation.coordinates[1]},${eventData.etablissement.localisation.coordinates[0]}`
+      }
+      
+      Linking.openURL(url)
+    }
     
 
     if(!fontsLoaded){
     return null
     }
-
-    const images = [
-        require('../assets/LovsterImage.jpeg'),
-        require('../assets/LovsterImage.jpeg'),
-        require('../assets/LovsterImage.jpeg'),
-      ];
-    
+  
 
     return (
         <View style={styles.container} >
@@ -40,24 +50,23 @@
         dotStyle={styles.dot}
         activeDotStyle={styles.activeDot}
       >
-        {images.map((image, index) => (
+        {eventData.etablissement.photos.map((image, index) => (
           <View key={index} style={styles.slide}>
-            <Image source={image} style={styles.image} />
+            <Image source={{uri: image}} style={styles.image} />
           </View>
         ))}
       </Swiper>
             <View style={styles.etablishmentCard}>
-                <Text style={styles.h2}>Café Lovster</Text>
-                <Text style={styles.type}>Bar / Restaurant</Text>
+                <Text style={styles.h2}>{eventData.etablissement.name}</Text>
+                <Text style={styles.type}>{eventData.etablissement.type}</Text>
                 <Text style={styles.note}>Note Google: 3,9/5</Text>
-                <Text style={styles.adress}>3/3 Bis Boulevard Carnot</Text>
-                <Text style={styles.adress}>59800 Lille</Text>
-                <Text style={styles.adress}>03 28 14 18 74</Text>
-                <Text style={styles.itinerary}><FontAwesome name='street-view' color={'#FF7337'} size={35} /> Y aller !</Text>
-                <Text style={styles.description}>Restaurant spécialisé dans les lobster rolls. Places assises, Sert de l'alcool, Cartes bancaires acceptées, Service de table.</Text>
+                <Text style={styles.adress}>{eventData.etablissement.adresse}</Text>
+                <Text style={styles.adress}>{eventData.etablissement.telephone}</Text>
+                <Text style={styles.itinerary} onPress={()=>handleOpenNavigation()}><FontAwesome name='street-view' color={'#FF7337'} size={35} /> Y aller !</Text>
+                <Text style={styles.description}>{eventData.etablissement.description}</Text>
                 <Text style={styles.currentEvent}>Evènements en cours</Text>
-                <Text style={styles.event}>Happy Hour de 18 à 20h</Text>
-                <Text style={styles.event}>5 Euros la pinte</Text>
+                <Text style={styles.event}>{eventData.title}</Text>
+                <Text style={styles.event}>{eventData.description}</Text>
             </View>
         </View>
 

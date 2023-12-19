@@ -84,11 +84,13 @@ export default function HomeScreen({ navigation }) {
     })
     eventList = eventsData.map((data, i) => {
       return (
-        <View style={styles.etablishmentCard}>
+        <View key={i} style={styles.etablishmentCard}>
           <Image style={styles.image} source={{uri: data.etablissement.photos[0]}} />
           <TouchableOpacity onPress={() => {
             setEtablishmentsModalVisible(false);
-            navigation.navigate('Description')
+            navigation.navigate('Description', {
+              eventData: data
+            })
           }}>
             <View style={styles.etablishmentInfo}>
               <Text style={styles.etablishmentName}>{data.etablissement.name}</Text>
@@ -108,7 +110,6 @@ export default function HomeScreen({ navigation }) {
     })
   }
 
-  console.log(eventList)
 
   // Fonts import
   if (!fontsLoaded) {
