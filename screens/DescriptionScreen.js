@@ -6,7 +6,7 @@
     ScrollView,
     Linking,
     Platform,
-    TouchableOpacity
+    TouchableOpacity,
   } from 'react-native';
   import FontAwesome from 'react-native-vector-icons/FontAwesome';
   import Swiper from 'react-native-swiper';
@@ -27,7 +27,6 @@
       'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
       'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
     });
-
     // fonction prenant la latitude et longitude envoyé dans le eventData pour redirection vers google maps
     const handleOpenNavigation = ()=>{
       let url =''
@@ -57,58 +56,57 @@
     if(!fontsLoaded){
     return null
     }
-
     
-    
-
     return (
-        <View style={styles.container} >
-            <Swiper
-        style={styles.swiper}
-        loop={false}
-        showsPagination={true}
-        dotStyle={styles.dot}
-        activeDotStyle={styles.activeDot}
-        paginationStyle={styles.paginationStyle}
-      >
-        {eventData.etablissement.photos.map((image, index) => (
+    
+      <View style={styles.container} >
+        <Swiper
+          style={styles.swiper}
+          loop={false}
+          showsPagination={true}
+          dotStyle={styles.dot}
+          activeDotStyle={styles.activeDot}
+          paginationStyle={styles.paginationStyle}
+        >
+          {eventData.etablissement.photos.map((image, index) => (
           <View key={index} style={styles.slide}>
             <Image source={{uri: image}} style={styles.image} />
           </View>
-        ))}
-      </Swiper>
-      <View style={styles.favorite}>
-      <Text style={styles.h2}>{eventData.etablissement.name}</Text>
-      <TouchableOpacity onPress={()=>handleLike(eventData.etablissement.id)}>
-        <FontAwesome name='star' color={isLiked?'#8440B4':'#D7D7E5'} size={30} style={styles.star}/>
-      </TouchableOpacity>
-      </View>
-            <View style={styles.etablishmentCard}>
-                <Text style={styles.type}>{eventData.etablissement.type}</Text>
-                <Text style={styles.note}>Note Google: 3,9/5</Text>
-                <Text style={styles.adress}>{eventData.etablissement.adresse}</Text>
-                <Text style={styles.adress}>{eventData.etablissement.telephone}</Text>
-                <TouchableOpacity style={styles.itineraryContent} onPress={()=>handleOpenNavigation()}>
-                    <FontAwesome name='location-arrow' color={'#FF7337'} size={30}
-                    />
-                    <Text style={styles.itinerary}>Y aller !</Text>
-                    </TouchableOpacity>
-                <Text style={styles.description}>{eventData.etablissement.description}</Text>
-                <Text style={styles.currentEvent}>Evènements en cours</Text>
-                <Text style={styles.event}>{eventData.title}</Text>
-                <Text style={styles.event}>{eventData.description}</Text>
-                <View style={styles.return}>
-    <TouchableOpacity
+          ))}
+        </Swiper>
+        <View style={styles.favorite}>
+          <Text style={styles.h2}>{eventData.etablissement.name}</Text>
+          <FontAwesome name='star' color={'#D7D7E5'} size={30} style={styles.star}
+          />
+        </View>
+        <View style={styles.etablishmentCard}>
+          <Text style={styles.type}>{eventData.etablissement.type}</Text>
+          <Text style={styles.note}>Note Google: 3,9/5</Text>
+          <Text style={styles.adress}>{eventData.etablissement.adresse}</Text>
+          <Text style={styles.adress}>{eventData.etablissement.telephone}</Text>
+          <TouchableOpacity style={styles.itineraryContent} onPress={()=>handleOpenNavigation()}>
+            <FontAwesome name='location-arrow' color={'#FF7337'} size={30}
+            />
+            <Text style={styles.itinerary}>Y aller !</Text>
+          </TouchableOpacity>
+          <Text style={styles.description}>{eventData.etablissement.description}</Text>
+          <Text style={styles.currentEvent}>Evènements en cours :</Text>
+          <ScrollView style={styles.scrollEvent}>
+            <Text style={styles.event}>{eventData.title}</Text>
+            <Text style={styles.eventDescription}>{eventData.description}</Text>
+          </ScrollView>
+          <View style={styles.return}>
+            <TouchableOpacity
               style={styles.buttonReturn}
               activeOpacity={0.8}
               onPress={() => navigation.navigate('Welcome')} >
-              <Text style={styles.textButtonReturn}>
-                Retour
-              </Text>
+                <Text style={styles.textButtonReturn}>
+                  Retour
+                </Text>
             </TouchableOpacity>
-            </View>
-            </View>
-  </View>
+          </View>
+          </View>
+          </View>
 
       )
   };
@@ -117,8 +115,8 @@
     container: {
       flex: 1,
       backgroundColor: '#ffffff',
-      alignItems: 'stretch',
-      justifyContent: 'flex-start',
+      // alignItems: 'stretch',
+      // justifyContent: 'flex-start',
     },
     swiper: {
       height: 320,
@@ -155,12 +153,13 @@
       justifyContent: 'space-between',
       marginLeft: 18,
       marginRight: 20,
-      marginTop: 20,
+      marginTop: -230,
+      marginBottom: -10,
     },
     etablishmentCard: {
       flex: 1,
       padding: 20,
-      bottom: Platform.OS=== 'ios'?245: 145,
+      marginTop: -520,
     },
     type: {
       fontSize: 20,
@@ -175,7 +174,7 @@
       marginBottom: 15,
     },
     adress: {
-      fontSize: 20,
+      fontSize: 18,
       color: '#341C42',
       fontFamily: 'Quicksand-Regular',
     },
@@ -190,7 +189,7 @@
       marginLeft: 10,
     },
     description: {
-      fontSize: 20,
+      fontSize: 18,
       color: '#321C3C',
       fontFamily: 'Quicksand-Regular',
       marginTop: 20,
@@ -207,10 +206,14 @@
       color: '#8440B4',
       fontFamily: 'Quicksand-Bold',
     },
+    eventDescription: {
+      fontSize: 16,
+      color: '#8440B4',
+      fontFamily: 'Quicksand-SemiBold',
+    },
     return: {
       alignItems: 'center',
       justifyContent: 'flex-end',
-      marginBottom: 40,
     },
     buttonReturn: {
       backgroundColor: '#FFF',
@@ -221,11 +224,17 @@
       width: 285,
       justifyContent: 'center',
       alignItems: 'center',
+      bottom: 30,
     },
     textButtonReturn: {
       color: '#8440B4',
       fontSize: 24,
       fontFamily: 'Quicksand-SemiBold',
     },
+    scrollEvent: {
+      flex: 1,
+      width: '100%',
+      height: 100,
+    }
     
   });
