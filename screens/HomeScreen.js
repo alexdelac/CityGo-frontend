@@ -99,7 +99,7 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.etablishmentAdress}>{data.etablissement.adresse}</Text>
               <Text style={styles.etablishmentPhone}>{data.etablissement.telephone}</Text>
               <Text style={styles.etablishmentEvent}>{data.title}</Text>
-              <Text style={styles.etablishmentEvent}>{data.description}</Text>
+              <Text style={styles.etablishmentEventDescription}>{data.description}</Text>
             </View>
           </TouchableOpacity>
           <View style={styles.etablishmentFavorite}>
@@ -415,6 +415,7 @@ const styles = StyleSheet.create({
   },
   etablishmentCard: {
     flexDirection: 'row',
+    width: '100vw',
     backgroundColor: '#FFF',
     borderBottomWidth: 1,
     borderColor: '#D7D7E5',
@@ -432,11 +433,12 @@ const styles = StyleSheet.create({
   scrollList: {
     width: '100%',
     height: 200,
+    backgroundColor: '#D7D7E5',
   },
   etablishmentName: {
     color: '#8440B4',
     fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
+    fontFamily: 'Quicksand-Bold',
   },
   etablishmentAdress: {
     color: '#321C3C',
@@ -452,6 +454,14 @@ const styles = StyleSheet.create({
     color: '#FF7337',
     fontSize: 15,
     fontFamily: 'Quicksand-Bold',
+    marginTop: 10,
+  },
+  etablishmentEventDescription: {
+    color: '#FF7337',
+    fontSize: 12,
+    fontFamily: 'Quicksand-SemiBold',
+    textAlign: 'justify',
+    width: '35%',
   },
   etablishmentPhone: {
     color: '#321C3C',
@@ -464,8 +474,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand-Regular',
   },
   etablishmentFavorite: {
-    marginLeft: 15,
-    marginTop: 10,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginLeft: 'auto',
   }
 
 
