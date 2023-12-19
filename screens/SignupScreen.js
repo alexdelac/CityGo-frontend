@@ -4,11 +4,11 @@ import {
 } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addUser } from '../reducers/user';
+import { login } from '../reducers/user';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useFonts } from 'expo-font'
 
-const BACKEND_ADDRESS = 'http://192.168.1.49:3000';
+const BACKEND_ADDRESS = 'http://192.168.1.60:3000';
 
 export default function SignupScreen({ navigation }) {
 
@@ -54,7 +54,7 @@ export default function SignupScreen({ navigation }) {
         .then((data) => {
           if (data.result) {
 
-            dispatch(addUser({ pseudo: pseudo, token: data.token }));
+            dispatch(login({ pseudo: pseudo, token: data.token }));
             navigation.navigate('Signin');
           }
           else {

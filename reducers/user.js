@@ -9,10 +9,6 @@ export const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
-        addUser: (state, action) => {
-            state.value.pseudonyme = action.payload.pseudonyme;
-            state.value.token = action.payload.token
-        },
         login: (state, action) => {
             state.value.token = action.payload.token;
             state.value.pseudonyme = action.payload.pseudonyme;
@@ -24,11 +20,14 @@ export const userSlice = createSlice({
         },
         changeLike: (state, action)=>{
             state.like = !state.like
+        },
+        updatePseudo: (state, action) => {
+            state.value.pseudonyme = action.payload
         }
 
     }
 })
 
 
-export const { addUser, login, logout, changeLike } = userSlice.actions;
+export const { login, logout, updatePseudo, changeLike } = userSlice.actions;
 export default userSlice.reducer;

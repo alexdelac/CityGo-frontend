@@ -61,26 +61,27 @@
     
       <View style={styles.container} >
         <Swiper
-          style={styles.swiper}
-          loop={false}
+          loop={true}
           showsPagination={true}
           dotStyle={styles.dot}
           activeDotStyle={styles.activeDot}
           paginationStyle={styles.paginationStyle}
         >
           {eventData.etablissement.photos.map((image, index) => (
-          <View key={index} style={styles.slide}>
+          <View key={index} >
             <Image source={{uri: image}} style={styles.image} />
           </View>
           ))}
         </Swiper>
+
+        <View style={styles.etablishmentCard}>
         <View style={styles.favorite}>
           <Text style={styles.h2}>{eventData.etablissement.name}</Text>
           <FontAwesome name='star' color={isLiked?'#8440B4':'#D7D7E5'} size={30} style={styles.star}
           onPress={()=>handleLike(eventData.etablissement.id)}
           />
         </View>
-        <View style={styles.etablishmentCard}>
+        
           <Text style={styles.type}>{eventData.etablissement.type}</Text>
           <Text style={styles.note}>Note Google: 3,9/5</Text>
           <Text style={styles.adress}>{eventData.etablissement.adresse}</Text>
@@ -116,32 +117,28 @@
     container: {
       flex: 1,
       backgroundColor: '#ffffff',
-      // alignItems: 'stretch',
-      // justifyContent: 'flex-start',
-    },
-    swiper: {
-      height: 320,
     },
     dot: {
       backgroundColor: '#C8C2BB',
       width: 10,
       height: 10,
       borderRadius: 5,
-      bottom: - 10,
     },
     activeDot: {
       backgroundColor: '#B261E3',
       width: 10,
       height: 10,
       borderRadius: 5,
-      bottom: -10,
-    },
-    slide: {
-      flex: 1,
     },
     image: {
       width: '100%',
       height: 300,
+    },
+    etablishmentCard: {
+      flex: 2,
+      width: '100%',
+      padding: 10,
+
     },
     h2: {
       fontSize: 32,
@@ -149,18 +146,9 @@
       fontFamily: 'Quicksand-Bold',
     },
     favorite: {
-      flex: 1,
       flexDirection: 'row',
+      alignItems: 'center',
       justifyContent: 'space-between',
-      marginLeft: 18,
-      marginRight: 20,
-      marginTop: -230,
-      marginBottom: -10,
-    },
-    etablishmentCard: {
-      flex: 1,
-      padding: 20,
-      marginTop: -520,
     },
     type: {
       fontSize: 20,
@@ -214,7 +202,8 @@
     },
     return: {
       alignItems: 'center',
-      justifyContent: 'flex-end',
+      marginBottom: 30,
+      padding: 10,
     },
     buttonReturn: {
       backgroundColor: '#FFF',
@@ -225,7 +214,6 @@
       width: 285,
       justifyContent: 'center',
       alignItems: 'center',
-      bottom: 30,
     },
     textButtonReturn: {
       color: '#8440B4',
@@ -233,9 +221,8 @@
       fontFamily: 'Quicksand-SemiBold',
     },
     scrollEvent: {
-      flex: 1,
       width: '100%',
-      height: 100,
+      height: 'auto',
     }
     
   });

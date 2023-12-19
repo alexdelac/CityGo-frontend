@@ -31,6 +31,7 @@ export default function HomeScreen({ navigation }) {
   const [isCheckedRestaurant, setCheckedRestaurant] = useState(false);
   const [isCheckedFavorite, setCheckedFavorite] = useState(false);
   const [isCheckedPromo, setCheckedPromo] = useState(false);
+  const [eventCardVisible, setEventCardVisible] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(new Date());
   const [date, setDate] = useState(new Date())
@@ -133,7 +134,14 @@ export default function HomeScreen({ navigation }) {
     event = filteredData.map((data, i) => {
       const latitude = data.etablissement.localisation.coordinates[1]
       const longitude = data.etablissement.localisation.coordinates[0]
-      return <Marker key={i} coordinate={{ latitude, longitude }} title={data.etablissement.name} pinColor='#8440B4' />
+      return <Marker 
+                key={i} 
+                coordinate={{ latitude, longitude }} 
+                title={data.etablissement.name}
+                onPress={() => setEventCardVisible(true)}
+                >
+        <FontAwesome name="map-marker" size={40} color="#8440B4" />
+      </Marker>
     })
     eventList = filteredData.map((data, i) => {
       return (
@@ -289,6 +297,43 @@ export default function HomeScreen({ navigation }) {
         </View>
       </Modal>
 
+      {/* Event modal from marker */}
+
+      <Modal
+        animationType='fade'
+        transparent={true}
+        visible={eventCardVisible}
+        onRequestClose={() => setEventCardVisible(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setEventCardVisible(false)}>
+            <View style={styles.modalEvent}>
+              <View style={styles.eventCard}>
+                <View style={styles.eventCardInfos}>
+                  <Image
+                  source={require('../assets/LovsterImage.jpeg')}
+                  style={styles.eventCardImage} 
+                  />
+                  <TouchableOpacity onPress={() => {}}>
+                    <View>
+                      <Text style={styles.eventCardName}>Café Lovster</Text>
+                      <Text style={styles.eventCardType}>Bar / Restaurant</Text>
+                      <Text style={styles.eventCardNote}>Note: 3,9/5</Text>
+                      <Text style={styles.eventCardAdress}>3/3 Bis Boulevard Carnot 59800 Lille</Text>
+                      <Text style={styles.eventCardAdress}>03 28 14 18 74</Text>
+                      <Text style={styles.eventCardEventTitle}>Happy Hour de 18 à 20h</Text>
+                      <Text style={styles.eventCardEventDescription}>Toutes les pintes à 5 Euros</Text>
+                    </View>
+                  </TouchableOpacity>
+                    <View>
+                      <FontAwesome name='star' color={'#D7D7E5'} size={25} marginRight={20}
+                      />
+                    </View>
+                  </View>       
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+      </Modal>
+
       {/* Mapview */}
       <MapView style={styles.map}
         initialRegion={{
@@ -297,7 +342,9 @@ export default function HomeScreen({ navigation }) {
           latitudeDelta: 0.0062,
           longitudeDelta: 0.0061,
         }}>
-        {currentPosition && <Marker coordinate={currentPosition} title="My position" pinColor="#FF7337" />}
+        {currentPosition && <Marker coordinate={currentPosition} title="Ma position">
+          <FontAwesome name="map-marker" size={40} color="#FF7337" />
+          </Marker>}
         {event}
       </MapView>
     </View>
@@ -331,14 +378,14 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5, // pour Android
     overflow: 'visible',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   filterBottom: {
     flexDirection: 'row',
     marginTop: 5,
   },
   filterPlace: {
-    width: 365,
+    width: '100%',
     height: 35,
     borderRadius: 5,
     borderWidth: 1,
@@ -347,7 +394,7 @@ const styles = StyleSheet.create({
     paddingLeft: 9,
   },
   filterWhen: {
-    width: 185,
+    width: '50%',
     height: 35,
     borderRadius: 5,
     borderWidth: 1,
@@ -361,7 +408,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FF7337',
     height: 35,
-    width: 170,
+    width: '40%',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 5,
@@ -401,7 +448,8 @@ const styles = StyleSheet.create({
   },
   modal: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0)',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
   modalView: {
     backgroundColor: '#8440B4',
@@ -530,7 +578,70 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     marginLeft: 'auto',
-  }
+  },
+  modalEvent: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+  },
+  eventCard: {
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    borderRadius: 20,
+    marginTop: '40%',
+    backgroundColor: '#FFF',
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 5, // pour Android
+    overflow: 'visible',
+  },
+  eventCardInfos:{
+    flexDirection: 'row',
+    padding: 15,
+    width: '60%',
+  },
+  eventCardImage: {
+    width: 130,
+    height: 180,
+    marginRight: 10,
+  },
+  eventCardName: {
+    fontSize: 16,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#FF7337',
+  },
+  eventCardType: {
+    fontSize: 13,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#321C3C',
+  },
+  eventCardNote: {
+    fontSize: 12,
+    fontFamily: 'Quicksand-Regular',
+    color: '#321C3C',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  eventCardAdress: {
+    fontSize: 12,
+    fontFamily: 'Quicksand-Regular',
+    color: '#321C3C',
+  },
+  eventCardEventTitle: {
+    fontSize: 15,
+    fontFamily: 'Quicksand-Bold',
+    color: '#FF7337',
+    marginTop: 10,
+  },
+  eventCardEventDescription: {
+    fontSize: 15,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#FF7337',
+  },
+  
 
 
 });
