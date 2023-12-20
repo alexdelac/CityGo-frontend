@@ -137,11 +137,11 @@
     etablishmentCard: {
       flex: 2,
       width: '100%',
-      padding: 10,
+      padding: 20,
 
     },
     h2: {
-      fontSize: 32,
+      fontSize: 30,
       color: '#8440B4',
       fontFamily: 'Quicksand-Bold',
     },
@@ -151,24 +151,25 @@
       justifyContent: 'space-between',
     },
     type: {
-      fontSize: 20,
+      fontSize: 18,
       color: '#341C42',
       fontFamily: 'Quicksand-Bold',
     },
     note: {
-      fontSize: 20,
+      fontSize: 18,
       color: '#341C42',
       fontFamily: 'Quicksand-Bold',
       marginTop: 15,
       marginBottom: 15,
     },
     adress: {
-      fontSize: 18,
+      fontSize: 16,
       color: '#341C42',
       fontFamily: 'Quicksand-Regular',
     },
     itineraryContent: {
       flexDirection: 'row',
+      marginTop: 10,
     },
     itinerary: {
       fontSize: 20,
@@ -178,7 +179,7 @@
       marginLeft: 10,
     },
     description: {
-      fontSize: 18,
+      fontSize: 16,
       color: '#321C3C',
       fontFamily: 'Quicksand-Regular',
       marginTop: 20,
