@@ -117,7 +117,7 @@ console.log(selectedStartDate)
 
 //ajoute ou supprime un établissement liké dans user.liked
   const handleLike = (id) => {
-    fetch('http://10.1.1.249:3000/users/like', {
+    fetch('http://192.168.1.60:3000/users/like', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: user.token, etablissementId: id }),
