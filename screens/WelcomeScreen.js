@@ -7,8 +7,10 @@ import {
   TextInput,
   TouchableOpacity, View
 } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useFonts } from 'expo-font'
+import {updateWelcomeType} from '../reducers/user'
+
 
 
 
@@ -19,7 +21,7 @@ export default function WelcomeScreen({ navigation }) {
   });
 
   const user = useSelector((state) => state.user.value);
-
+  const dispatch = useDispatch()
 
   if (!fontsLoaded) {
     return null
@@ -34,10 +36,10 @@ export default function WelcomeScreen({ navigation }) {
         <Text style={styles.title}>où allons-nous ?</Text>
       </View>
       <View style={styles.buttoncontainer}>
-        <TouchableOpacity onPress={() => navigation.navigate("TabNavigator", { screen: "Home" })} style={styles.button} activeOpacity={0.8}>
+        <TouchableOpacity onPress={() => {dispatch(updateWelcomeType('Restaurant')); navigation.navigate("TabNavigator")}} style={styles.button} activeOpacity={0.8}>
           <Text style={styles.textButton}>Restaurant</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("TabNavigator", { screen: "Home" })} style={styles.button} activeOpacity={0.8}>
+        <TouchableOpacity onPress={() => navigation.navigate("TabNavigator")} style={styles.button} activeOpacity={0.8}>
           <Text style={styles.textButton}>Bar</Text>
         </TouchableOpacity>
       </View>

@@ -71,7 +71,7 @@ export default function FavorisScreen({ navigation }) {
           />
           <FontAwesome 
             name='circle' 
-            color={'#D7D7E5'} 
+            color={data.inProgress ?'#87E35B' : '#D7D7E5'} 
             size={25}
           />
         </View>

@@ -20,7 +20,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { format } from 'date-fns';
 import * as Location from 'expo-location';
 import { useSelector, useDispatch } from 'react-redux'
-import { changeLike } from '../reducers/user'
+import { changeLike, updateWelcomeType } from '../reducers/user'
 import { AutocompleteDropdown, AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown';
 
 export default function HomeScreen({ navigation }) {
@@ -41,11 +41,14 @@ export default function HomeScreen({ navigation }) {
   const [adresse, setAdresse] = useState('')
   const [modalMarkerDetail, setModalMarkerDetail] = useState('')
 
- 
 
+  const welcomeType = useSelector((state)=>state.user.welcomeType)
   const user = useSelector((state) => state.user.value)
   const like = useSelector((state) => state.user.like)
   const dispatch = useDispatch()
+
+  console.log(welcomeType)
+ 
 
   const [fontsLoaded] = useFonts({
     'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
@@ -77,6 +80,8 @@ export default function HomeScreen({ navigation }) {
           });
       }
     })();
+    welcomeType === 'Restaurant' ? setCheckedRestaurant(true): setCheckedBar(true)
+    dispatch(updateWelcomeType(''))
   }, []);
 
 console.log(selectedStartDate)

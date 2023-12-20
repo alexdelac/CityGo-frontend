@@ -2,7 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialState = {
     value: { pseudonyme: null, token: null },
-    like: false
+    like: false,
+    welcomeType: '',
 };
 
 export const userSlice = createSlice({
@@ -23,11 +24,14 @@ export const userSlice = createSlice({
         },
         updatePseudo: (state, action) => {
             state.value.pseudonyme = action.payload
+        },
+        updateWelcomeType: (state, action)=>{
+            state.welcomeType = action.payload
         }
 
     }
 })
 
 
-export const { login, logout, updatePseudo, changeLike } = userSlice.actions;
+export const { login, logout, updatePseudo, changeLike, updateWelcomeType } = userSlice.actions;
 export default userSlice.reducer;
