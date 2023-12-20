@@ -8,7 +8,8 @@ import {
   Image,
   ScrollView,
   TouchableWithoutFeedback,
-  Platform
+  Platform,
+  Keyboard
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
@@ -20,10 +21,11 @@ import { format } from 'date-fns';
 import * as Location from 'expo-location';
 import { useSelector, useDispatch } from 'react-redux'
 import { changeLike } from '../reducers/user'
+import { AutocompleteDropdown, AutocompleteDropdownContextProvider } from 'react-native-autocomplete-dropdown';
 
 export default function HomeScreen({ navigation }) {
 
-  const [currentPosition, setCurrentPosition] = useState(null);
+  const [currentPosition, setCurrentPosition] = useState({ latitude: 50.637699, longitude: 3.064728 });
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [EtablishmentsModalVisible, setEtablishmentsModalVisible] = useState(false);
   const [isCheckedEvent, setCheckedEvent] = useState(false);
@@ -34,12 +36,12 @@ export default function HomeScreen({ navigation }) {
   const [eventCardVisible, setEventCardVisible] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(new Date());
-  const [date, setDate] = useState(new Date())
   const [eventsData, setEventsData] = useState(null)
+  const [selection, setSelection] = useState(null)
+  const [adresse, setAdresse] = useState('')
+  const [modalMarkerDetail, setModalMarkerDetail] = useState('')
 
-  console.log(selectedStartDate)
-
-
+ 
 
   const user = useSelector((state) => state.user.value)
   const like = useSelector((state) => state.user.like)
@@ -60,31 +62,55 @@ export default function HomeScreen({ navigation }) {
   const handleConfirm = (date) => {
     console.warn("Date sélectionnée: ", date);
     setSelectedStartDate(date);
-    hideDatePicker();
+    // hideDatePicker();
   };
 
-
+// récupération de la localisation au lancement de l'application
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status === 'granted') {
         Location.watchPositionAsync({ distanceInterval: 10 },
           (location) => {
-            fetch('http://10.1.1.249:3000/events/display', {
-              method: 'POST',
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ latitude: location.coords.latitude, longitude: location.coords.longitude, date: selectedStartDate, token: user.token }),
-            })
-              .then(response => response.json())
-              .then(data => {
-                setEventsData(data.data)
-                setCurrentPosition(location.coords);
-              })
+            setCurrentPosition(location.coords);
+
           });
       }
     })();
-  }, [like, selectedStartDate]);
+  }, []);
 
+console.log(selectedStartDate)
+
+//recupération des events selon date et localisation
+  useEffect(() => {
+    fetch('http://10.1.1.249:3000/events/display', {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latitude: currentPosition.latitude, longitude: currentPosition.longitude, date: selectedStartDate, token: user.token }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        setEventsData(data.data)
+
+      })
+  }, [like, selectedStartDate, currentPosition])
+
+
+ //a chaque modification de l'input adresse intérroge l'API data.gouv afin d'obtenir les 5 adresse les plus pertinantes avec leurs coordonnées gps
+  useEffect(() => {
+    if (adresse.length > 3) {
+      fetch(`https://api-adresse.data.gouv.fr/search/?q=${adresse}&type=municipality&limit=5`)
+        .then(response => response.json())
+        .then(data => {
+          setSelection(data.features.map((data, i) => {
+            return { id: i, title: data.properties.label, coord: data.geometry }
+
+          }))
+        })
+    }
+  }, [adresse])
+
+//ajoute ou supprime un établissement liké dans user.liked
   const handleLike = (id) => {
     fetch('http://10.1.1.249:3000/users/like', {
       method: 'POST',
@@ -93,15 +119,48 @@ export default function HomeScreen({ navigation }) {
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data)
-
         dispatch(changeLike())
       })
   }
 
+// contenu de la modal Event modal from marker (paramétre infos envoyé directement par le marker)
+  const eventModal = (infos) => {
+    setEventCardVisible(true)
+    setModalMarkerDetail(
+      <View style={styles.eventCardInfos}>
+        <Image
+          source={{uri: infos.etablissement.photos[0]}}
+          style={styles.eventCardImage}
+        />
+        <TouchableOpacity onPress={() => {
+            setEtablishmentsModalVisible(false);
+            navigation.navigate('Description', {
+              eventData: infos
+            })
+          }}>
+          <View>
+            <Text style={styles.eventCardName}>{infos.etablissement.name}</Text>
+            <Text style={styles.eventCardType}>{infos.etablissement.type}</Text>
+            <Text style={styles.eventCardType}>à {infos.etablissement.distance} mètres</Text>
+            <Text style={styles.eventCardNote}>Note: 3,9/5</Text>
+            <Text style={styles.eventCardAdress}>{infos.etablissement.adresse}</Text>
+            <Text style={styles.eventCardAdress}>{infos.etablissement.telephone}</Text>
+            <Text style={styles.eventCardEventTitle}>{infos.title}</Text>
+            <Text style={styles.eventCardEventDescription}>{infos.description}</Text>
+          </View>
+        </TouchableOpacity>
+        <View>
+          <FontAwesome name='star' color={infos.etablissement.isLiked ? '#8440B4' : '#D7D7E5'} size={25} marginRight={20}
+            onPress={() => handleLike(infos.etablissement.id)}
+          />
+        </View>
+      </View>
+    )
+
+  }
+
   let event
   let eventList
-
   if (eventsData) {
 
 
@@ -130,19 +189,21 @@ export default function HomeScreen({ navigation }) {
       filteredData = filteredData
     }
 
-
+//itération sur la data pour génération des marker
     event = filteredData.map((data, i) => {
       const latitude = data.etablissement.localisation.coordinates[1]
       const longitude = data.etablissement.localisation.coordinates[0]
-      return <Marker 
-                key={i} 
-                coordinate={{ latitude, longitude }} 
-                title={data.etablissement.name}
-                onPress={() => setEventCardVisible(true)}
-                >
+      return <Marker
+        key={i}
+        coordinate={{ latitude, longitude }}
+        title={data.etablissement.name}
+        onPress={() => eventModal(data)}
+      >
         <FontAwesome name="map-marker" size={40} color="#8440B4" />
       </Marker>
     })
+
+//itération sur la data pour génération des cards de la liste
     eventList = filteredData.map((data, i) => {
       return (
         <View key={i} style={styles.etablishmentCard}>
@@ -181,36 +242,59 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.container}>
       {/* Filter view */}
       <View style={styles.filterContainer}>
-        <View style={styles.filter}>
-          <TextInput
-            placeholder={'Adresse, ville, métro...'}
-            style={styles.filterPlace}
-          />
-          <View style={styles.filterBottom}>
-            <TextInput
-              placeholder='Quand ?'
-              onFocus={showDatePicker}
-              // value={selectedStartDate ? format(selectedStartDate, 'dd/MM/yy HH:mm') : ''}
-              style={styles.filterWhen}
+        <AutocompleteDropdownContextProvider>
+          <View style={styles.filter}>
+            <AutocompleteDropdown
+              clearOnFocus={false}
+              closeOnBlur={true}
+              closeOnSubmit={false}
+              onSelectItem={(item) => { item && setCurrentPosition({ latitude: item.coord.coordinates[1], longitude: item.coord.coordinates[0] }) }}
+              onChangeText={(value) => setAdresse(value.replace(/ /g, '+'))}
+              textInputProps={{
+                placeholder: 'Adresse, ville, métro...',
+                style: {
+                  fontSize: 15,
+                  alignSelf: 'center',
+                  paddingLeft: 9,
+                }
+              }}
+              dataSet={selection}
+              inputContainerStyle={{
+                width: '100%',
+                height: 35,
+                borderRadius: 5,
+                borderWidth: 1,
+                borderColor: '#D7D7E5',
+                backgroundColor: 'white',
+                marginTop: 40,
+              }}
             />
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="datetime"
-              onConfirm={handleConfirm}
-              onCancel={() => { hideDatePicker() }}
-              locale="fr"
-              cancelTextIOS="Annuler" // A voir pour Android
-              confirmTextIOS="Confirmer" // A voir pour Android
-            />
-            <TouchableOpacity
-              style={styles.buttonFilter}
-              activeOpacity={0.8}
-              onPress={() => setIsFilterModalVisible(!isFilterModalVisible)}
-            >
-              <Text style={styles.textButtonFilter}>+ de filtres</Text>
-            </TouchableOpacity>
+            <View style={styles.filterBottom}>
+              <TextInput
+                placeholder='Quand ?'
+                onFocus={showDatePicker}
+                value={selectedStartDate ? format(selectedStartDate, 'dd/MM/yy HH:mm') : ''}
+                style={styles.filterWhen}
+              />
+              <DateTimePickerModal
+                isVisible={isDatePickerVisible}
+                mode="datetime"
+                onConfirm={ handleConfirm }
+                onCancel={() => { hideDatePicker(); Keyboard.dismiss() }}
+                locale="fr"
+                cancelTextIOS="Annuler" // A voir pour Android
+                confirmTextIOS="Confirmer" // A voir pour Android
+              />
+              <TouchableOpacity
+                style={styles.buttonFilter}
+                activeOpacity={0.8}
+                onPress={() => setIsFilterModalVisible(!isFilterModalVisible)}
+              >
+                <Text style={styles.textButtonFilter}>+ de filtres</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        </AutocompleteDropdownContextProvider>
       </View>
       {/* Filter modal*/}
       <Modal
@@ -304,47 +388,37 @@ export default function HomeScreen({ navigation }) {
         transparent={true}
         visible={eventCardVisible}
         onRequestClose={() => setEventCardVisible(false)}
-        >
-          <TouchableWithoutFeedback onPress={() => setEventCardVisible(false)}>
-            <View style={styles.modalEvent}>
-              <View style={styles.eventCard}>
-                <View style={styles.eventCardInfos}>
-                  <Image
-                  source={require('../assets/LovsterImage.jpeg')}
-                  style={styles.eventCardImage} 
-                  />
-                  <TouchableOpacity onPress={() => {}}>
-                    <View>
-                      <Text style={styles.eventCardName}>Café Lovster</Text>
-                      <Text style={styles.eventCardType}>Bar / Restaurant</Text>
-                      <Text style={styles.eventCardNote}>Note: 3,9/5</Text>
-                      <Text style={styles.eventCardAdress}>3/3 Bis Boulevard Carnot 59800 Lille</Text>
-                      <Text style={styles.eventCardAdress}>03 28 14 18 74</Text>
-                      <Text style={styles.eventCardEventTitle}>Happy Hour de 18 à 20h</Text>
-                      <Text style={styles.eventCardEventDescription}>Toutes les pintes à 5 Euros</Text>
-                    </View>
-                  </TouchableOpacity>
-                    <View>
-                      <FontAwesome name='star' color={'#D7D7E5'} size={25} marginRight={20}
-                      />
-                    </View>
-                  </View>       
+      >
+        <TouchableWithoutFeedback onPress={() => setEventCardVisible(false)}>
+          <View style={styles.modalEvent}>
+            <View style={styles.eventCard}>
+              <View >
+
+                {modalMarkerDetail}
               </View>
             </View>
-          </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
       </Modal>
 
       {/* Mapview */}
       <MapView style={styles.map}
         initialRegion={{
-          latitude: 50.637699,
-          longitude: 3.064728,
+          latitude: currentPosition.latitude,
+          longitude: currentPosition.longitude,
           latitudeDelta: 0.0062,
           longitudeDelta: 0.0061,
-        }}>
+        }}
+        region={{
+          latitude: currentPosition.latitude,
+          longitude: currentPosition.longitude,
+          latitudeDelta: 0.0062,
+          longitudeDelta: 0.0061,
+        }}
+      >
         {currentPosition && <Marker coordinate={currentPosition} title="Ma position">
           <FontAwesome name="map-marker" size={40} color="#FF7337" />
-          </Marker>}
+        </Marker>}
         {event}
       </MapView>
     </View>
@@ -598,7 +672,7 @@ const styles = StyleSheet.create({
     elevation: 5, // pour Android
     overflow: 'visible',
   },
-  eventCardInfos:{
+  eventCardInfos: {
     flexDirection: 'row',
     padding: 15,
     width: '60%',
@@ -641,7 +715,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand-SemiBold',
     color: '#FF7337',
   },
-  
+
 
 
 });
