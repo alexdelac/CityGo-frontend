@@ -282,6 +282,7 @@ export default function HomeScreen({ navigation }) {
         visible={EtablishmentsModalVisible}
         onRequestClose={() => setEtablishmentsModalVisible(false)}
       >
+        <TouchableWithoutFeedback onPress={() => setEtablishmentsModalVisible(false)}>
         <View style={styles.modal}>
           <View style={styles.listModal}>
             <Text
@@ -295,6 +296,7 @@ export default function HomeScreen({ navigation }) {
             </ScrollView>
           </View>
         </View>
+        </TouchableWithoutFeedback>
       </Modal>
 
       {/* Event modal from marker */}
@@ -520,10 +522,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderBottomWidth: 1,
     borderColor: '#D7D7E5',
-    padding: 8,
+    padding: 10,
   },
   image: {
-    width: 135,
+    width: 130,
     height: 190,
   },
   etablishmentInfo: {
