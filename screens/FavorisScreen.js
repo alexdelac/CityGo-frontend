@@ -4,8 +4,8 @@ import {
     View,
     Image,
   } from 'react-native';
-  import {useFonts} from 'expo-font';
-  import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import {useFonts} from 'expo-font';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useEffect, useState } from 'react';
 import {useSelector, useDispatch} from 'react-redux'
 import {changeLike} from'../reducers/user'
@@ -73,29 +73,10 @@ if(dataFavoris){
     </View>)
   })
 }
-
+  }
 
   
-
-    if(!fontsLoaded){
-      return null
-    }
-
-    return (
-    
-    <View style={styles.container}>
-      <Text style={styles.h2}>
-        Mes Favoris
-      </Text>
-      {favoris}
-    </View>
-
-
-
-    );
-  };
-
-
+  
 
   const styles = StyleSheet.create({
     container: {
@@ -113,8 +94,9 @@ if(dataFavoris){
     },
     card: {
       flexDirection: 'row',
-      justifyContent: 'space-around',
-      borderBottomWidth: 1,
+      justifyContent: 'flex-start',
+      backgroundColor: '#FFF',
+      borderTopWidth: 1,
       borderColor: '#D7D7E5',
       width: '100%',
       padding: 10,
@@ -124,10 +106,15 @@ if(dataFavoris){
       width: 105,
       height: 90,
       padding: 5,
+      marginRight: 10,
+    },
+    infos: {
+      alignItems: 'flex-start',
+
     },
     name: {
       fontSize: 16,
-      fontFamily: 'Quicksand-SemiBold',
+      fontFamily: 'Quicksand-Bold',
       color: '#8440B4',
     },
     type: {
@@ -142,14 +129,13 @@ if(dataFavoris){
       color: '#321C3C',
       marginBottom: 3,
     },
-    distance: {
-      fontSize: 13,
-      fontFamily: 'Quicksand-SemiBold',
-      color: '#FF7337',
-    },
     favorite: {
       justifyContent: "space-between",
-      alignItems: 'center',
+      marginLeft: 'auto',
+    },
+    favoritesContainer: {
+      backgroundColor: '#D7D7E5',
+      flex: 1,
     }
 
   })
