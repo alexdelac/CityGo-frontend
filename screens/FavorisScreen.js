@@ -77,7 +77,7 @@ import {changeLike} from'../reducers/user'
           />
         </View>
       </View>
-    </View>)
+    )
   })
 }
   }
