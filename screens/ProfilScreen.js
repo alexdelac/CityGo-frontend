@@ -12,6 +12,7 @@ import { useFonts } from 'expo-font';
 import { logout, updatePseudo } from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const BACKEND_ADDRESS = 'http://192.168.1.60:3000';
 
@@ -20,7 +21,6 @@ export default function ProfilScreen({ navigation }) {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.value)
   const [modalVisible, setModalVisible] = useState(false);
-  const [validModalVisible, setValidModalVisible] = useState(false);
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -29,9 +29,8 @@ export default function ProfilScreen({ navigation }) {
   const [newEmail, setNewEmail] = useState('');
   const [newPseudo, setNewPseudo] = useState('');
   const [newInfoModalVisible, setNewInfoModalVisible] = useState(false);
-  const [newValidModalVisible, setNewValidModalVisible] = useState(false);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [token, setToken] = useState('');
+  const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
+  const [confirmationModalInfo, setConfirmationModalInfo] = useState({});
 
   const [fontsLoaded] = useFonts({
     'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
@@ -41,11 +40,11 @@ export default function ProfilScreen({ navigation }) {
     'Quicksand-Regular': require('../assets/fonts/Quicksand-Regular.ttf'),
   });
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigation.navigate('Signin');
-  };
-
+ 
+const handleCloseConfirmationModal = () => {
+  
+  setConfirmationModalVisible(false)
+}
   const handleUpdatePassword = () => {
     fetch(`${BACKEND_ADDRESS}/users/updatePassword`, {
       method: 'PUT',
@@ -56,7 +55,8 @@ export default function ProfilScreen({ navigation }) {
       .then(data => {
         if (data.result) {
           setModalVisible(false)
-          setValidModalVisible(true)
+          setConfirmationModalInfo({title: 'Changement de mot de passe', message:'Mot de passe changé avec succès !'})
+          setConfirmationModalVisible(true)
         } else {
           setError(data.error)
         }
@@ -71,10 +71,12 @@ export default function ProfilScreen({ navigation }) {
     })
       .then(response => response.json())
       .then(data => {
+        
         if (data.result) {
           dispatch(updatePseudo(newPseudo))
           setNewInfoModalVisible(false)
-          setNewValidModalVisible(true)
+          setConfirmationModalInfo({title: 'Modifier mes informations', message:'Pseudo et Email changés avec succès !'})
+          setConfirmationModalVisible(true)
         } else {
           setError(data.error)
         }
@@ -89,17 +91,20 @@ export default function ProfilScreen({ navigation }) {
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data)
+        
         if (data.result) {
           dispatch(logout())
-          setDeleteModalVisible(true)
+          navigation.navigate('Signup')
         } else {
           setError(data.error)
         }
       })
   };
 
-
+ const handleLogout = () => {
+    dispatch(logout());
+    navigation.navigate('Signin');
+  };
 
   if (!fontsLoaded) {
     return null
@@ -181,31 +186,7 @@ export default function ProfilScreen({ navigation }) {
             </View>
           </KeyboardAvoidingView>
         </Modal>
-        <Modal
-          animationType='slide'
-          transparent={true}
-          visible={newValidModalVisible}
-          onRequestClose={() => {
-            setNewValidModalVisible(!newValidModalVisible);
-          }}>
-          <View style={styles.modal}>
-            <View style={styles.modalView}>
-
-              <Text style={styles.h2Modal}>
-                Modifier mes informations
-              </Text>
-              <Text style={styles.modalViewText}>informations changées !</Text>
-              <TouchableOpacity
-                style={styles.button}
-                activeOpacity={0.8}
-                onPress={() => setNewValidModalVisible(false)} >
-                <Text style={styles.textButton}>
-                  OK
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+        
 
         <TouchableOpacity onPress={() => setModalVisible(!modalVisible)} style={styles.button} activeOpacity={0.8}>
           <Text style={styles.textButton}>Changer de mot de passe</Text>
@@ -287,32 +268,7 @@ export default function ProfilScreen({ navigation }) {
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* Modal to confirm that the password has been changed */}
-      <Modal
-        animationType='slide'
-        transparent={true}
-        visible={validModalVisible}
-        onRequestClose={() => {
-          setValidModalVisible(!validModalVisible);
-        }}>
-        <View style={styles.modal}>
-          <View style={styles.modalView}>
-
-            <Text style={styles.h2Modal}>
-              Changement mot de passe
-            </Text>
-            <Text style={styles.modalViewText}>Mot de passe change !</Text>
-            <TouchableOpacity
-              style={styles.button}
-              activeOpacity={0.8}
-              onPress={() => setValidModalVisible(false)} >
-              <Text style={styles.textButton}>
-                OK
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      
       <View style={styles.bottomButtons}>
         <TouchableOpacity style={styles.deconnectbutton} activeOpacity={0.8} onPress={() => handleLogout()}>
           <Text style={styles.textdeconnectButton}>Se déconnecter</Text>
@@ -322,30 +278,12 @@ export default function ProfilScreen({ navigation }) {
         </TouchableOpacity>
       </View>
       <Modal
-        animationType='slide'
-        transparent={true}
-        visible={deleteModalVisible}
-        onRequestClose={() => {
-          setDeleteModalVisible(!deleteModalVisible);
-        }}>
-        <View style={styles.modal}>
-          <View style={styles.modalView}>
-
-            <Text style={styles.h2Modal}>
-              Suppression du compte
-            </Text>
-            <Text style={styles.modalViewText}>Compte supprimé !</Text>
-            <TouchableOpacity
-              style={styles.button}
-              activeOpacity={0.8}
-              onPress={() => setDeleteModalVisible(false)} >
-              <Text style={styles.textButton}>
-                OK
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      animationType='slide'
+      transparent={true}
+      visible={confirmationModalVisible}
+      onRequestClose={() => {
+        setConfirmationModalVisible(!confirmationModalVisible);
+      }}><ConfirmationModal handleCloseConfirmationModal={handleCloseConfirmationModal} title={confirmationModalInfo.title} message={confirmationModalInfo.message}/></Modal>
     </View>
   )
 };

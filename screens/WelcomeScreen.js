@@ -42,8 +42,8 @@ if(!fontsLoaded){
            <Text style={styles.title}>où allons-nous ?</Text>
           </View>
           <View style={styles.buttoncontainer}>
-          <TouchableOpacity style={styles.button} activeOpacity={0.8}>
-            <Text onPress={() => navigation.navigate("TabNavigator", { screen: "Home" })} style={styles.textButton}>Restaurant</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("TabNavigator", { screen: "Home" })} style={styles.button} activeOpacity={0.8}>
+            <Text  style={styles.textButton}>Restaurant</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate("TabNavigator", { screen: "Home" })} style={styles.button} activeOpacity={0.8}>
             <Text style={styles.textButton}>Bar</Text>

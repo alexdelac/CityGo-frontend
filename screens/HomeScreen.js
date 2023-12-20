@@ -70,7 +70,7 @@ export default function HomeScreen({ navigation }) {
       if (status === 'granted') {
         Location.watchPositionAsync({ distanceInterval: 10 },
           (location) => {
-            fetch('http://10.1.1.249:3000/events/display', {
+            fetch('http://192.168.1.60:3000/events/display', {
               method: 'POST',
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ latitude: location.coords.latitude, longitude: location.coords.longitude, date: selectedStartDate, token: user.token }),
@@ -86,7 +86,7 @@ export default function HomeScreen({ navigation }) {
   }, [like, selectedStartDate]);
 
   const handleLike = (id) => {
-    fetch('http://10.1.1.249:3000/users/like', {
+    fetch('http://192.168.1.60:3000/users/like', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: user.token, etablissementId: id }),

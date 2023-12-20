@@ -55,7 +55,7 @@ export default function SignupScreen({ navigation }) {
           if (data.result) {
 
             dispatch(login({ pseudo: pseudo, token: data.token }));
-            navigation.navigate('Signin');
+            navigation.navigate('Welcome');
           }
           else {
             setErrorSignup(data.error)
