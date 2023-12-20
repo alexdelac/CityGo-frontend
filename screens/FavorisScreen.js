@@ -11,28 +11,29 @@ import {useSelector, useDispatch} from 'react-redux'
 import {changeLike} from'../reducers/user'
 
 
-export default function FavorisScreen({ navigation }) {
-  
-  const [dataFavoris, setDataFavoris]=useState(null)
-  const dispatch = useDispatch()
-  const user = useSelector((state) => state.user.value)
-  const like = useSelector((state)=>state.user.like)
-  const [fontsLoaded] = useFonts({
-    'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
-    'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
-  });
-  
-  useEffect(()=>{
-    fetch('http://10.1.1.249:3000/etablissements/favoris', {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: user.token}),
-    })
-    .then(response=>response.json())
-    .then(data=>{
-      setDataFavoris(data.data.liked)
-    })
-  }, [like])
+  export default function FavorisScreen({ navigation }) {
+    const [dataFavoris, setDataFavoris]=useState(null)
+
+    const dispatch = useDispatch()
+    const user = useSelector((state) => state.user.value)
+    const like = useSelector((state)=>state.user.like)
+
+    const [fontsLoaded] = useFonts({
+      'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
+      'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
+    });
+
+    useEffect(()=>{
+      fetch('http://192.168.1.60:3000/etablissements/favoris', {
+              method: 'POST',
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ token: user.token}),
+            })
+            .then(response=>response.json())
+            .then(data=>{
+              setDataFavoris(data.data.liked)
+            })
+    }, [like])
 
   const handleLike = (id)=>{
     fetch('http://10.1.1.249:3000/users/like', {
@@ -71,31 +72,18 @@ export default function FavorisScreen({ navigation }) {
           />
           <FontAwesome 
             name='circle' 
-            color={'#D7D7E5'} 
+            color={data.inProgress ?'#87E35B' : '#D7D7E5'} 
             size={25}
           />
         </View>
       </View>
-      )
-      })
-    }
-    
-    if(!fontsLoaded){
-      return null
-    }
+    )
+  })
+}
+  }
 
-    return (
-    
-    <View style={styles.container}>
-      <Text style={styles.h2}>
-        Mes Favoris
-      </Text>
-      <View style={styles.favoritesContainer}>
-        {favoris}
-      </View>
-    </View>
-    );
-  };
+  
+  
 
   const styles = StyleSheet.create({
     container: {
