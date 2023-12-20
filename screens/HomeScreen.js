@@ -133,7 +133,8 @@ console.log(selectedStartDate)
           style={styles.eventCardImage}
         />
         <TouchableOpacity onPress={() => {
-            setEtablishmentsModalVisible(false);
+            setModalMarkerDetail(false);
+            setEventCardVisible(false);
             navigation.navigate('Description', {
               eventData: infos
             })
@@ -146,7 +147,13 @@ console.log(selectedStartDate)
             <Text style={styles.eventCardAdress}>{infos.etablissement.adresse}</Text>
             <Text style={styles.eventCardAdress}>{infos.etablissement.telephone}</Text>
             <Text style={styles.eventCardEventTitle}>{infos.title}</Text>
-            <Text style={styles.eventCardEventDescription}>{infos.description}</Text>
+            <Text 
+              style={styles.eventCardEventDescription}
+              numberOfLines={3} 
+              ellipsizeMode="tail"
+            >
+              {infos.description}
+            </Text>
           </View>
         </TouchableOpacity>
         <View>
@@ -638,7 +645,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Quicksand-SemiBold',
     textAlign: 'justify',
-    width: '35%',
+    marginRight: 150, // à voir sur Android
+    
   },
   etablishmentPhone: {
     color: '#321C3C',
@@ -676,18 +684,18 @@ const styles = StyleSheet.create({
   },
   eventCardInfos: {
     flexDirection: 'row',
-    padding: 15,
     width: '60%',
+    padding: 15,
   },
   eventCardImage: {
-    width: 130,
-    height: 180,
+    width: '60%',
+    height: 220,
     marginRight: 10,
   },
   eventCardName: {
     fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#FF7337',
+    color: '#8440B4',
   },
   eventCardType: {
     fontSize: 13,
