@@ -84,7 +84,6 @@ export default function HomeScreen({ navigation }) {
     dispatch(updateWelcomeType(''))
   }, []);
 
-console.log(selectedStartDate)
 
 //recupération des events selon date et localisation
   useEffect(() => {
@@ -95,6 +94,7 @@ console.log(selectedStartDate)
     })
       .then(response => response.json())
       .then(data => {
+        console.log(data.data[0].etablissement)
         setEventsData(data.data)
 
       })
@@ -194,9 +194,9 @@ console.log(selectedStartDate)
       filteredData = filteredData
     }
     if (isCheckedBar) {
-      filteredData = filteredData.filter(e => e.etablissement.type.includes('Bar'))
+      filteredData = filteredData.filter(e => e.etablissement.type.includes('Bar') || e.etablissement.type.includes('Bar / Restaurant'))
     } else if (isCheckedRestaurant) {
-      filteredData = filteredData.filter(e => e.etablissement.type.includes('Restaurant'))
+      filteredData = filteredData.filter(e => e.etablissement.type.includes('Restaurant') || e.etablissement.type.includes('Bar / Restaurant'))
     } else {
       filteredData = filteredData
     }

@@ -13,7 +13,7 @@ import { useState } from 'react';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useFonts } from 'expo-font'
 
-const BACKEND_ADDRESS = 'http://192.168.1.60:3000';
+const BACKEND_ADDRESS = 'http://10.1.1.249:3000';
 
 export default function SigninScreen({ navigation }) {
 
@@ -94,7 +94,9 @@ export default function SigninScreen({ navigation }) {
           placeholderTextColor={'#D7D7E5'}
           placeholder={isFocused === 'Email' ? '' : 'Email'}
           onChangeText={(value) => setEmail(value)}
-          value={email} />
+          value={email}
+          autoCapitalize='none'
+          />
         {isFocused === 'Mot de passe' && <Text style={styles.inputLabelPassword}>Mot de passe</Text>}
         <TextInput
           onFocus={() => setIsFocused('Mot de passe')}

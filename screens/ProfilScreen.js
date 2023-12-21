@@ -11,10 +11,10 @@ import {
 import { useFonts } from 'expo-font';
 import { logout, updatePseudo } from '../reducers/user';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ConfirmationModal from '../components/ConfirmationModal';
 
-const BACKEND_ADDRESS = 'http://192.168.1.60:3000';
+const BACKEND_ADDRESS = 'http://10.1.1.249:3000';
 
 export default function ProfilScreen({ navigation }) {
 
@@ -31,6 +31,7 @@ export default function ProfilScreen({ navigation }) {
   const [newInfoModalVisible, setNewInfoModalVisible] = useState(false);
   const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
   const [confirmationModalInfo, setConfirmationModalInfo] = useState({});
+  const [email, setEmail]=useState(null)
 
   const [fontsLoaded] = useFonts({
     'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
@@ -39,6 +40,18 @@ export default function ProfilScreen({ navigation }) {
     'Quicksand-Medium': require('../assets/fonts/Quicksand-Medium.ttf'),
     'Quicksand-Regular': require('../assets/fonts/Quicksand-Regular.ttf'),
   });
+
+  useEffect(()=>{
+    fetch(`${BACKEND_ADDRESS}/users/profile`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: user.token }),
+    })
+      .then(response=>response.json())
+      .then(data=>{
+        setEmail(data.email)
+      })
+  }, [user])
 
  
 const handleCloseConfirmationModal = () => {
@@ -121,7 +134,7 @@ const handleCloseConfirmationModal = () => {
         </View>
         <View style={styles.infosBottomText}>
           <Text style={styles.titleText}>E-mail : </Text>
-          <Text style={styles.userText}>{newEmail}</Text>
+          <Text style={styles.userText}>{email}</Text>
         </View>
         <TouchableOpacity onPress={() => setNewInfoModalVisible(!modalVisible)} style={styles.button} activeOpacity={0.8}>
           <Text style={styles.textButton}>Modifier mes informations</Text>
