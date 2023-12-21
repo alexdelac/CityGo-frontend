@@ -8,7 +8,7 @@ import { login } from '../reducers/user';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useFonts } from 'expo-font'
 
-const BACKEND_ADDRESS = 'http://192.168.1.60:3000';
+const BACKEND_ADDRESS = 'http://10.1.2.64:3000';
 
 export default function SignupScreen({ navigation }) {
 
@@ -133,10 +133,10 @@ export default function SignupScreen({ navigation }) {
       <Text style={styles.message}>ou inscris-toi grâce à tes réseaux :</Text>
       <View style={styles.logocontainer}>
         <TouchableOpacity>
-          <FontAwesome name='facebook-square' style={styles.logo} size={50} color='#000080'></FontAwesome>
+          <FontAwesome name='facebook' style={styles.logo} size={55} color='#FF7337'/>
         </TouchableOpacity>
         <TouchableOpacity>
-          <FontAwesome name='google' style={styles.logo} size={50}></FontAwesome>
+          <FontAwesome name='google' style={styles.logo} size={55} color='#FF7337'/>
         </TouchableOpacity>
       </View>
       <View style={styles.textContainer}>
@@ -227,6 +227,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
+    color: '#341C42',
   },
 
   linkText: {
@@ -239,13 +240,19 @@ const styles = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     fontFamily: 'Quicksand-SemiBold',
+    color: '#341C42',
 
   },
   logocontainer: {
     flexDirection: 'row',
 
   },
+  logo: {
+    margin: 20,
+  },
   error: {
+    marginTop: 5,
     fontFamily: 'Quicksand-Bold',
+    color: '#341C42',
   },
 });

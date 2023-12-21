@@ -40,7 +40,7 @@
     }
 
     const handleLike = (id)=>{
-      fetch('http://192.168.1.60:3000/users/like', {
+      fetch('http://10.1.2.64:3000/users/like', {
                 method: 'POST',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token: user.token, etablissementId: id }),
@@ -101,7 +101,7 @@
             <TouchableOpacity
               style={styles.buttonReturn}
               activeOpacity={0.8}
-              onPress={() => navigation.navigate('Welcome')} >
+              onPress={() => navigation.navigate('Plan')} >
                 <Text style={styles.textButtonReturn}>
                   Retour
                 </Text>

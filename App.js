@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -9,9 +9,12 @@ import ProfilScreen from './screens/ProfilScreen';
 import SigninScreen from './screens/SigninScreen';
 import SignupScreen from './screens/SignupScreen';
 import TopdealsScreen from './screens/TopdealsScreen';
+import IntroductionScreen1 from './screens/IntroductionScreen1';
+import IntroductionScreen2 from './screens/IntroductionScreen2';
+import IntroductionScreen3 from './screens/IntroductionScreen3';
 import DescriptionScreen from './screens/DescriptionScreen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import user from './reducers/user';
 import types from './reducers/types';
 import { persistStore, persistReducer } from 'redux-persist';
@@ -79,13 +82,17 @@ export default function App() {
     //   }
     // })()
   
+  
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
-    <NavigationContainer>
+      <NavigationContainer>
 
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-
+          
+          <Stack.Screen name="Introduction1" component={IntroductionScreen1} />
+          <Stack.Screen name="Introduction2" component={IntroductionScreen2} />
+          <Stack.Screen name="Introduction3" component={IntroductionScreen3} />
           <Stack.Screen name="Signup" component={SignupScreen} />
           <Stack.Screen name="Signin" component={SigninScreen} />
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
