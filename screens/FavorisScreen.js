@@ -25,7 +25,7 @@ import {changeLike} from'../reducers/user'
     });
     console.log(dataFavoris)
     useEffect(()=>{
-      fetch('http://10.1.2.64:3000/etablissements/favoris', {
+      fetch('http://10.1.1.249:3000/etablissements/favoris', {
               method: 'POST',
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ token: user.token}),
@@ -37,7 +37,7 @@ import {changeLike} from'../reducers/user'
     }, [like])
 
   const handleLike = (id)=>{
-    fetch('http://10.1.2.64:3000/users/like', {
+    fetch('http://10.1.1.249:3000/users/like', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: user.token, etablissementId: id }),

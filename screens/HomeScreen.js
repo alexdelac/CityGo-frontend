@@ -40,6 +40,7 @@ export default function HomeScreen({ navigation }) {
   const [selection, setSelection] = useState(null)
   const [adresse, setAdresse] = useState('')
   const [modalMarkerDetail, setModalMarkerDetail] = useState('')
+  const [newDate, setNewDate]=useState(false)
 
 
   const welcomeType = useSelector((state)=>state.user.welcomeType)
@@ -65,6 +66,7 @@ export default function HomeScreen({ navigation }) {
   const handleConfirm = (date) => {
     console.warn("Date sélectionnée: ", date);
     setSelectedStartDate(date);
+    setNewDate(true)
     // hideDatePicker();
   };
 
@@ -87,16 +89,14 @@ export default function HomeScreen({ navigation }) {
 
 //recupération des events selon date et localisation
   useEffect(() => {
-    fetch('http://10.1.2.64:3000/events/display', {
+    fetch('http://10.1.1.249:3000/events/display', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: currentPosition.latitude, longitude: currentPosition.longitude, date: selectedStartDate, token: user.token }),
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data.data[0].etablissement)
         setEventsData(data.data)
-
       })
   }, [like, selectedStartDate, currentPosition])
 
@@ -117,7 +117,7 @@ export default function HomeScreen({ navigation }) {
 
 //ajoute ou supprime un établissement liké dans user.liked
   const handleLike = (id) => {
-    fetch('http://10.1.2.64:3000/users/like', {
+    fetch('http://10.1.1.249:3000/users/like', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: user.token, etablissementId: id }),
@@ -193,10 +193,12 @@ export default function HomeScreen({ navigation }) {
     } else {
       filteredData = filteredData
     }
-    if (isCheckedBar) {
-      filteredData = filteredData.filter(e => e.etablissement.type.includes('Bar') || e.etablissement.type.includes('Bar / Restaurant'))
+    if (isCheckedBar && isCheckedRestaurant) {
+      filteredData = filteredData
     } else if (isCheckedRestaurant) {
       filteredData = filteredData.filter(e => e.etablissement.type.includes('Restaurant') || e.etablissement.type.includes('Bar / Restaurant'))
+    } else if (isCheckedBar){
+      filteredData = filteredData.filter(e => e.etablissement.type.includes('Bar') || e.etablissement.type.includes('Bar / Restaurant'))
     } else {
       filteredData = filteredData
     }
@@ -285,7 +287,7 @@ export default function HomeScreen({ navigation }) {
               <TextInput
                 placeholder='Quand ?'
                 onFocus={showDatePicker}
-                value={selectedStartDate ? format(selectedStartDate, 'dd/MM/yy HH:mm') : ''}
+                value={!newDate ? '' : format(selectedStartDate, 'dd/MM/yy HH:mm')}
                 style={styles.filterWhen}
               />
               <DateTimePickerModal
