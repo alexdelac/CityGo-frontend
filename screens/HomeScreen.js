@@ -40,6 +40,7 @@ export default function HomeScreen({ navigation }) {
   const [selection, setSelection] = useState(null)
   const [adresse, setAdresse] = useState('')
   const [modalMarkerDetail, setModalMarkerDetail] = useState('')
+  const [newDate, setNewDate]=useState(false)
 
 
   const welcomeType = useSelector((state)=>state.user.welcomeType)
@@ -65,6 +66,7 @@ export default function HomeScreen({ navigation }) {
   const handleConfirm = (date) => {
     console.warn("Date sélectionnée: ", date);
     setSelectedStartDate(date);
+    setNewDate(true);
     // hideDatePicker();
   };
 
@@ -94,7 +96,6 @@ export default function HomeScreen({ navigation }) {
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data.data[0].etablissement)
         setEventsData(data.data)
 
       })
@@ -285,7 +286,7 @@ export default function HomeScreen({ navigation }) {
               <TextInput
                 placeholder='Quand ?'
                 onFocus={showDatePicker}
-                value={selectedStartDate ? format(selectedStartDate, 'dd/MM/yy HH:mm') : ''}
+                value={!newDate ? '' : format(selectedStartDate, 'dd/MM/yy HH:mm')}
                 style={styles.filterWhen}
               />
               <DateTimePickerModal

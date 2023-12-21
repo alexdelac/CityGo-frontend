@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import ConfirmationModal from '../components/ConfirmationModal';
 
-const BACKEND_ADDRESS = 'http://10.1.1.249:3000';
+const BACKEND_ADDRESS = 'http://10.1.2.64:3000';
 
 export default function ProfilScreen({ navigation }) {
 
