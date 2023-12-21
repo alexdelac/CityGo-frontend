@@ -5746,7 +5746,7 @@ react-native@0.72.6:
 
 react-redux@^9.0.4:
   version "9.0.4"
-  resolved "https://registry.npmjs.org/react-redux/-/react-redux-9.0.4.tgz"
+  resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-9.0.4.tgz#6892d465f086507a517d4b53eb589876e6bc8344"
   integrity sha512-9J1xh8sWO0vYq2sCxK2My/QO7MzUMRi3rpiILP/+tDr8krBHixC6JMM17fMK88+Oh3e4Ae6/sHIhNBgkUivwFA==
   dependencies:
     "@types/use-sync-external-store" "^0.0.3"
@@ -5821,7 +5821,7 @@ redux-thunk@^3.1.0:
 
 redux@^5.0.0:
   version "5.0.0"
-  resolved "https://registry.npmjs.org/redux/-/redux-5.0.0.tgz"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-5.0.0.tgz#29572e29a439e094ff8fec46883fc45053f6736d"
   integrity sha512-blLIYmYetpZMET6Q6uCY7Jtl/Im5OBldy+vNPauA8vvsdqyt66oep4EUpAMWNHauTC6xa9JuRPhRB72rY82QGA==
 
 regenerate-unicode-properties@^10.1.0:

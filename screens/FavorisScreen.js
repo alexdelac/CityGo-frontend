@@ -3,6 +3,7 @@ import {
     Text,
     View,
     Image,
+    ScrollView
   } from 'react-native';
 import {useFonts} from 'expo-font';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -24,7 +25,7 @@ import {changeLike} from'../reducers/user'
     });
     console.log(dataFavoris)
     useEffect(()=>{
-      fetch('http://10.1.1.249:3000/etablissements/favoris', {
+      fetch('http://10.1.2.64:3000/etablissements/favoris', {
               method: 'POST',
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ token: user.token}),
@@ -36,7 +37,7 @@ import {changeLike} from'../reducers/user'
     }, [like])
 
   const handleLike = (id)=>{
-    fetch('http://10.1.1.249:3000/users/like', {
+    fetch('http://10.1.2.64:3000/users/like', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: user.token, etablissementId: id }),
@@ -91,18 +92,11 @@ return (
   <Text style={styles.h2}>
     Mes Favoris
   </Text>
+  <ScrollView style={styles.favorisContainer}>
   {favoris}
-  <View style={styles.favoritesContainer}>
-    {favoris}
-  </View>
+  </ScrollView>
 </View>
-
-
-
 );
-
-
-
 }
 
  
@@ -113,6 +107,10 @@ return (
       backgroundColor: '#fff',
       alignItems: 'center',
       justifyContent: 'flex-start',
+    },
+    favorisContainer: {
+      backgroundColor: '#D7D7E5',
+      flex: 2,
     },
     h2: {
       fontSize: 36,

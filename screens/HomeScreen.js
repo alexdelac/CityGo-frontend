@@ -87,7 +87,7 @@ export default function HomeScreen({ navigation }) {
 
 //recupération des events selon date et localisation
   useEffect(() => {
-    fetch('http://10.1.1.249:3000/events/display', {
+    fetch('http://10.1.2.64:3000/events/display', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ latitude: currentPosition.latitude, longitude: currentPosition.longitude, date: selectedStartDate, token: user.token }),
@@ -117,7 +117,7 @@ export default function HomeScreen({ navigation }) {
 
 //ajoute ou supprime un établissement liké dans user.liked
   const handleLike = (id) => {
-    fetch('http://10.1.1.249:3000/users/like', {
+    fetch('http://10.1.2.64:3000/users/like', {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: user.token, etablissementId: id }),

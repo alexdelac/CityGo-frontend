@@ -118,13 +118,13 @@ export default function SigninScreen({ navigation }) {
       </TouchableOpacity>
       </KeyboardAvoidingView>
       <View style={styles.bottomContainer}>
-      <Text style={styles.reseauxText}>ou connecte-toi grâce à tes réseaux</Text>
+      <Text style={styles.message}>ou connecte-toi grâce à tes réseaux</Text>
       <View style={styles.logocontainer}>
-        <TouchableOpacity>
-          <FontAwesome name='facebook-square' size={50} style={styles.logo} color='#000080'></FontAwesome>
+      <TouchableOpacity>
+          <FontAwesome name='facebook' style={styles.logo} size={55} color='#FF7337'/>
         </TouchableOpacity>
         <TouchableOpacity>
-          <FontAwesome name='google' size={50} style={styles.logo}></FontAwesome>
+          <FontAwesome name='google' style={styles.logo} size={55} color='#FF7337'/>
         </TouchableOpacity>
       </View>
       <View style={styles.box}>
@@ -190,12 +190,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 
-  reseauxText: {
-    fontSize: 24,
-    textAlign: 'center',
-    fontFamily: 'Quicksand-SemiBold',
-  },
-
   buttonText: {
     color: 'white',
     fontSize: 24,
@@ -210,6 +204,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
+    color: '#341C42',
   },
 
   linkText: {
@@ -248,7 +243,7 @@ const styles = StyleSheet.create({
 
   },
   logo: {
-    width: '100%',
+    margin: 20,
   },
   error: {
     fontFamily: 'Quicksand-Medium',
@@ -256,5 +251,12 @@ const styles = StyleSheet.create({
   },
   inputIsFocused: {
     borderColor: '#FF7337',
+  },
+  message: {
+    fontSize: 24,
+    textAlign: 'center',
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#341C42',
+
   },
 });

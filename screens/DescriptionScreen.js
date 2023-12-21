@@ -101,7 +101,7 @@
             <TouchableOpacity
               style={styles.buttonReturn}
               activeOpacity={0.8}
-              onPress={() => navigation.navigate('Welcome')} >
+              onPress={() => navigation.navigate('Plan')} >
                 <Text style={styles.textButtonReturn}>
                   Retour
                 </Text>
