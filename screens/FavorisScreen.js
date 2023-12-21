@@ -22,9 +22,9 @@ import {changeLike} from'../reducers/user'
       'Quicksand-Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
       'Quicksand-SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf')
     });
-
+    console.log(dataFavoris)
     useEffect(()=>{
-      fetch('http://192.168.1.60:3000/etablissements/favoris', {
+      fetch('http://10.1.1.249:3000/etablissements/favoris', {
               method: 'POST',
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ token: user.token}),
@@ -80,10 +80,32 @@ import {changeLike} from'../reducers/user'
     )
   })
 }
-  }
 
-  
-  
+
+if(!fontsLoaded){
+  return null
+}
+return (
+
+<View style={styles.container}>
+  <Text style={styles.h2}>
+    Mes Favoris
+  </Text>
+  {favoris}
+  <View style={styles.favoritesContainer}>
+    {favoris}
+  </View>
+</View>
+
+
+
+);
+
+
+
+}
+
+ 
 
   const styles = StyleSheet.create({
     container: {
